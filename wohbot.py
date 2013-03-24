@@ -57,6 +57,15 @@ class Bot:
 		else:
 			return False
 
+	def getRemainingATKPower(self):
+		mypage_url = self.getURL("mypage")
+		html = self.parsePage(mypage_url)
+		if html:
+			atk_text = html.select(".AttackPowerTxt")[0].get_text()
+			return int(re.match(r"\d+", atk_text).group())
+		else:
+			return False
+
 	def farm(self, iterations):
 		mission_url = self.getURL("mission-%s" %self.settings["farm_mission"])
 
