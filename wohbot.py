@@ -57,6 +57,14 @@ class Bot:
 		else:
 			return False
 
+	def getRemainingSilver(self):
+		mypage_url = self.getURL("mypage")
+		html = self.parsePage(mypage_url)
+		if html:
+			return int(html.select(".silver")[0].get_text().strip().replace(',', ''))
+		else:
+			return False
+
 	def getRemainingATKPower(self):
 		mypage_url = self.getURL("mypage")
 		html = self.parsePage(mypage_url)
