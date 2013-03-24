@@ -84,6 +84,8 @@ def main():
 	}
 	bot = Bot(settings)
 	bot.maxFarm()
+	# Adding a second maxFarm to catch the Levelups.  Should be done better at a later time
+	bot.maxFarm()
 	print "Done!"
 
 if __name__ == '__main__':
