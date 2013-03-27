@@ -46,8 +46,18 @@ class Player:
 				for card in page_cards:
 					unique_id = re.search(r"desc\/(\d+)", card.get("href")).group(1)
 					if(unique_id):
+						middle_element = card.findParent("table")
+						top_element = middle_element.findPreviousSibling("div")
+						bottom_element = middle_element.findNextSibling("table")
+						#print top_element
+						rarity = re.search(r"\((\w+)\)", str(top_element.find("p"))).group(1)
+						print rarity
+						alignment = re.search(r"(\W+)", str(top_element.find("span"))).group(1)
+
 						properties = {
-							"global_id": unique_id,
+							"rarity": rarity,
+							"alignment": alignment,
+
 						}
 						#curr_card = 
 
@@ -58,7 +68,7 @@ class Player:
 		new_roster = list(set(new_roster))
 
 		for each_card in new_roster:
-			print each_card.get_unique_id() 
+			print each_card.get_alignment() 
 
 		return 
 

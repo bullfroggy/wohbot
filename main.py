@@ -22,10 +22,10 @@ def main():
 
 	}
 	bot = Bot(settings)
-	bot.update_roster()
-	#bot.max_farm()
+	#bot.update_roster()
+	bot.max_farm()
 	# Adding a second maxFarm to catch the Levelups.  Should be done better at a later time
-	#bot.max_farm()
+	bot.max_farm()
 	print "Done!"
 
 if __name__ == '__main__':
