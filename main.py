@@ -1,6 +1,6 @@
 import requests, re, optparse, urls
 from bs4 import BeautifulSoup
-from wohbot import Bot
+from bot import Bot
 
 class Woh:
 	settings = {
@@ -19,12 +19,13 @@ def main():
 	settings = {
 		"sid": options.sid,
 		"farm_mission": options.farm_mission,
+
 	}
 	bot = Bot(settings)
-	print bot.updateCardIDs()
-	#bot.maxFarm()
+	#bot.update_roster()
+	bot.max_farm()
 	# Adding a second maxFarm to catch the Levelups.  Should be done better at a later time
-	#bot.maxFarm()
+	bot.max_farm()
 	print "Done!"
 
 if __name__ == '__main__':
