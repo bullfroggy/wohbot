@@ -2,7 +2,7 @@
 class Card:
 	properties = {
 		"global_id": "",
-		"unique_id": "",
+		#"unique_id": "",
 		"rarity": "",
 		"max_level": 99,
 		"level": 1,
@@ -13,14 +13,21 @@ class Card:
 		"silver": 0,
 	}
 
-	def __init__(self, properties):
+	def __init__(self, unique_id, properties):
+		self.unique_id = unique_id
 		self.properties.update(properties)
+
+	def __eq__(self, other):
+		return self.get_unique_id()==other.get_unique_id()
+
+	def __hash__(self):
+		return hash(('unique_id', self.get_unique_id()))
 
 	def set_global_id(self, global_id):
 		self.global_id = global_id
 
 	def get_global_id(self):
-		return self.global_id
+		return self.properties["global_id"]
 
 	def set_unique_id(self, unique_id):
 		self.unique_id = unique_id

@@ -1,5 +1,6 @@
 import urls, requests, re
 from bs4 import BeautifulSoup
+from card import Card
 
 class Player:
 	settings = {
@@ -15,6 +16,7 @@ class Player:
 		self.catalog = [] # populate via update_cards method
 		self.presents = []
 		self.device_presents = []
+		self.pending_trades = []
 	
 	def get_farm_url(self):
 		if self.settings["farm_mission"]:
@@ -32,21 +34,32 @@ class Player:
 			return 0
 
 	def update_cards(self):
-		card_ids = []
+		new_roster = []
 		card_list_urls = [urls.CARD_LIST_INDEX+str(page) for page in range(0, self.get_card_count(), 10)]
 		for url in card_list_urls:
 			print "Walking " + url + "..."
 			html = self.parse_page(url)
 			if html:
-				curr_cards = html.select("a[href^="+CARD_LIST_DESC+"]")
-				#curr_cards = html.select(".member_bg>div+table~table")
+				page_cards = html.select("a[href^="+urls.CARD_LIST_DESC+"]")
+				#page_cards = html.select(".member_bg>div+table~table")
 				
-				for card in curr_cards:
+				for card in page_cards:
 					unique_id = re.search(r"desc\/(\d+)", card.get("href")).group(1)
+					if(unique_id):
+						properties = {
+							"global_id": unique_id,
+						}
+						#curr_card = 
 
-					card_ids += unique_id
+						#print curr_card.get_unique_id()
+						
+						new_roster.append(Card(unique_id, properties))
 
-		print list(set(card_ids))
+		new_roster = list(set(new_roster))
+
+		for each_card in new_roster:
+			print each_card.get_unique_id() 
+
 		return 
 
 	def get_sid(self):
