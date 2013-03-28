@@ -9,12 +9,12 @@ def main():
     p.add_option('--farm_mission', '-f', default="mission_23")
     options, arguments = p.parse_args()
 
-    if options.sid == "":
+    if not options.sid:
         print "Please Enter you SID:"
         options.sid = raw_input()
 
     player_settings = {
-        "sid": "180e805f931d58667447bf26043a48fe",
+        "sid": "",
         "farm_mission": options.farm_mission,
 
     }
