@@ -2,14 +2,15 @@ import urls, requests, re
 from bs4 import BeautifulSoup
 from card import Card
 
-class Player:
-    settings = {
-                "sid": "",
-                "name": "",
-                "level": 0,
-                "farm_mission": urls.MISSION_2_3,
 
-            }
+class Player(object):
+    settings = {
+        "sid": "",
+        "name": "",
+        "level": 0,
+        "farm_mission": urls.MISSION_2_3,
+
+    }
 
     def __init__(self, settings):
         self.settings.update(settings)
@@ -34,12 +35,12 @@ class Player:
 
     def update_cards(self):
         new_roster = []
-        card_list_urls = [urls.CARD_LIST_INDEX+str(page) for page in range(0, self.get_card_count(), 10)]
+        card_list_urls = [urls.CARD_LIST_INDEX + str(page) for page in range(0, self.get_card_count(), 10)]
         for url in card_list_urls:
             print "Walking " + url + "..."
             html = self.parse_page(url)
             if html:
-                page_cards = html.select("a[href^="+urls.CARD_LIST_DESC+"]")
+                page_cards = html.select("a[href^=" + urls.CARD_LIST_DESC + "]")
                 #page_cards = html.select(".member_bg>div+table~table")
 
                 for card in page_cards:

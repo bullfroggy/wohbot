@@ -1,14 +1,15 @@
 import optparse
 from bot import Bot
 
-class Woh:
+
+class Woh(object):
     settings = {
-                "farm_mission": "23",
-                "urls": {
+        "farm_mission": "23",
+        "urls": {
 
 
-                }
-            }
+        }
+    }
 
 def main():
     p = optparse.OptionParser()
