@@ -52,8 +52,8 @@ for a in range(1,4):
 					if archive_soup.select(".userLeft"):
 						card_exists = True
 
-						alignment = a
-						min_rarity = br
+						alignment = str(a).encode('utf-8')
+						min_rarity = str(br).encode('utf-8')
 						base_id = str(id).zfill(3).encode('utf-8')
 
 						name = re.search(r"\W+\s+(.*?)\(", archive_soup.select(".window3")[0].get_text().encode('utf-8').strip()).group(1)
