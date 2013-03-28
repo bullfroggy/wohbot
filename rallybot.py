@@ -1,6 +1,7 @@
 import optparse
 from player import Player
 
+
 def main():
     p = optparse.OptionParser()
     p.add_option('--sid', '-s', default="")

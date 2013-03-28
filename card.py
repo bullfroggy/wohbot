@@ -1,16 +1,16 @@
 class Card(object):
     properties = {
-    "global_id": "",
-    "img_id": "",
-    "alignment": 1,
-    "rarity": 0,
-    "max_level": 99,
-    "level": 1,
-    "ability_level": 1,
-    "atk_pwr": None,
-    "def_pwr": None,
-    "pwr_req": None,
-    "silver": 0,
+        "global_id": "",
+        "img_id": "",
+        "alignment": 1,
+        "rarity": 0,
+        "max_level": 99,
+        "level": 1,
+        "ability_level": 1,
+        "atk_pwr": None,
+        "def_pwr": None,
+        "pwr_req": None,
+        "silver": 0,
     }
 
     def __init__(self, unique_id, properties):
@@ -58,7 +58,6 @@ class Card(object):
 
     def set_silver(self, silver):
         self.properties.update({"silver": silver})
-
 
     def get_global_id(self):
         return self.properties["global_id"]
