@@ -1,28 +1,23 @@
 import optparse
+from player import Player
 from bot import Bot
 
-
-class Woh(object):
-    settings = {
-        "farm_mission": "23",
-        "urls": {
-
-
-        }
-    }
 
 def main():
     p = optparse.OptionParser()
     p.add_option('--sid', '-s', default="")
-    p.add_option('--farm_mission', '-f', default="23")
+    p.add_option('--farm_mission', '-f', default="mission_23")
     options, arguments = p.parse_args()
-    settings = {
-        "sid": options.sid,
+    player_settings = {
+        "sid": "180e805f931d58667447bf26043a48fe",
         "farm_mission": options.farm_mission,
 
     }
-    bot = Bot(settings)
-    #bot.update_roster()
+    player = Player(player_settings)
+    bot_settings = {
+        "player": player,
+    }
+    bot = Bot(bot_settings)
     bot.max_farm()
     # Adding a second maxFarm to catch the Levelups.  Should be done better at a later time
     bot.max_farm()

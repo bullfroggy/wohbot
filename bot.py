@@ -1,30 +1,32 @@
-import urls
-from player import Player
+from woh import WoH
 
 
 class Bot(object):
     settings = {
-        "sid": "",
-        "farm_mission": "23",
+        "player": None,
     }
+    player = None
 
     def __init__(self, settings):
         self.settings.update(settings)
-        if self.settings["farm_mission"] == "24":
-            selected_mission = urls.MISSION_2_4
-        else:
-            selected_mission = urls.MISSION_2_3
-
-        player_settings = {
-            "sid": self.settings["sid"],
-            "farm_mission": selected_mission
-        }
-        self.player = Player(player_settings)
+        self.player = self.settings["player"]
+        self.woh = WoH(self.player)
 
     def update_roster(self):
         return self.player.update_cards()
 
+    def farm(self, iterations):
+        mission_url = self.player.get_farm_url()
+
+        print "Running the farm %s times." % iterations
+        if self.woh.parse_page(mission_url):
+            for x in range(0, iterations - 1):
+                self.woh.parse_page(mission_url)
+        else:
+            return False
+
+        return True
 
     def max_farm(self):
-        self.player.max_farm()
-        return
+        required_battles = int(self.player.get_remaining_energy() / 3)
+        self.farm(required_battles)
