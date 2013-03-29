@@ -9,13 +9,12 @@ def main():
     p.add_option('--farm_mission', '-f', default="mission_23")
     options, arguments = p.parse_args()
     player_settings = {
-        "sid": "180e805f931d58667447bf26043a48fe",
-        "farm_mission": options.farm_mission,
-
+        "sid": options.sid,
+        "farm_mission": options.farm_mission
     }
     player = Player(player_settings)
     bot_settings = {
-        "player": player,
+        "player": player
     }
     bot = Bot(bot_settings)
     bot.max_farm()

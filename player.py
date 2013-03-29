@@ -2,7 +2,6 @@ import re
 from card import Card
 from woh import WoH
 
-
 class Player(object):
     settings = {
         "sid": "",
@@ -117,4 +116,33 @@ class Player(object):
             return int(rally_text)
         else:
             return False
+
+    def CardAvailable(self):
+        html = self.woh.parse_page(self.woh.URLS['packs'])
+        if html:
+            if "Daily Free Card Pack" in str(html):
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    def buyRallyPacks(self, cart):
+        rallyURL = self.woh.parse_page(self.woh.URLS['buy_rally_pack'])
+        if self.woh.parse_page(rallyURL):
+            for x in range(1, cart):
+                self.woh.parse_page(rallyURL)
+        else:
+            return False
+
+        return True
+
+    def freeRallyPack(self):
+        rallyURL = self.woh.parse_page(self.woh.URLS['buy_rally_pack'])
+        if self.woh.parse_page(rallyURL):
+            self.woh.parse_page(rallyURL)
+        else:
+            return False
+
+        return True
 
