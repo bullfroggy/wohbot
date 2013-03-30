@@ -129,18 +129,18 @@ class Player(object):
 
     def buyRallyPacks(self, cart):
         rallyURL = self.woh.parse_page(self.woh.URLS['buy_rally_pack'])
-        if self.woh.parse_page(rallyURL):
-            for x in range(1, cart):
-                self.woh.parse_page(rallyURL)
+        if rallyURL:
+            for x in range(0, cart - 1):
+                self.woh.parse_page(self.woh.URLS['buy_rally_pack'])
         else:
             return False
 
         return True
 
     def freeRallyPack(self):
-        rallyURL = self.woh.parse_page(self.woh.URLS['buy_rally_pack'])
-        if self.woh.parse_page(rallyURL):
-            self.woh.parse_page(rallyURL)
+        rallyURL = self.woh.parse_page(self.woh.URLS['free_pack'])
+        if rallyURL:
+            self.woh.parse_page(self.woh.URLS['free_pack'])
         else:
             return False
 
