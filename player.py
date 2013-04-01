@@ -148,34 +148,33 @@ class Player(object):
         return True
 
     def rallyAll(self):
-        for x in range(0, 100000):
+        f=open('users.txt')
+        for x in f:
             start = "http://ultimate-a.cygames.jp/ultimate/cheer/index/"
-            ID = x
+            ID = int(x)
             startU = "http://ultimate-a.cygames.jp/ultimate/profile/show/"
             URL = start + str(ID)
             userURL = startU + str(ID)
             self.woh.URLS['rally_rand'] = URL
             self.woh.URLS['user_page'] = userURL
             userPage = self.woh.parse_page(userURL)
-            time.sleep(1)
+            #time.sleep(1)
             if userPage:
                 if "An error has been detected" not in str(userPage):
-                    print x
+                    print ID
                     rallyURL = self.woh.parse_page(URL)
-                    time.sleep(1)
+                    #time.sleep(1)
                     if "Received 4 Rally Points!" in str(rallyURL):
-                        continue
-                    #     print "Successfully rallied user"
+                        print "Successfully rallied user"
                     else:
-                    #     print "Could not rally user"
-                    #     if "Your Rally has reached maximum limit" in str(rallyURL):
-                    #         print "Maximum rally limit reached"
-                    #         return True
+                        print "Could not rally user"
+                        if "Your Rally has reached maximum limit" in str(rallyURL):
+                            print "Maximum rally limit reached"
+                            return True
                         if "excessive tapping" in str(userPage):
                             print "Too many taps"
                         if "excessive tapping" in str(rallyURL):
                             print "Too many taps"
-
             else:
                 return False
         return True
