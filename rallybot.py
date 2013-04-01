@@ -1,7 +1,6 @@
 import optparse
 from player import Player
-from bot import Bot
-
+import time
 
 def main():
     p = optparse.OptionParser()
@@ -13,24 +12,24 @@ def main():
         "farm_mission": options.farm_mission
     }
     player = Player(player_settings)
-    bot_settings = {
-        "player": player
-    }
-    bot = Bot(bot_settings)
     points = player.getRallyPoints()
-    print points, "rally points"
-    print "rallying players"
-    bot.randRally()
-    if points / 200 > 1:
-        cart = points / 200
-        print "buying", cart, "cards"
-        player.buyRallyPacks(cart)
-    else:
-        print "not buying"
     available = player.CardAvailable()
     print "free card pack available:", available
     if available:
         player.freeRallyPack()
+    print points, "rally points"
+    print "rallying players"
+    player.rallyAll()
+    time.sleep(3)
+    points = player.getRallyPoints()
+    print points, "rally points"
+    if points / 200 >= 1:
+        cart = points / 200
+        print "attempting to buy", cart, "rally packs"
+        player.buyRallyPacks(cart)
+    else:
+        print "not buying"
+    time.sleep(3)
     points = player.getRallyPoints()
     print points, "rally points"
     print "Done!"

@@ -11,7 +11,7 @@ class WoH(object):
         "card_list_index": "http://ultimate-a.cygames.jp/ultimate/card_list/index/0/1/0/",
         "card_list_desc": "http://ultimate-a.cygames.jp/ultimate/card_list/desc/",
         "packs": "http://ultimate-a.cygames.jp/ultimate/gacha/index/0",
-	"draw_free": "http://ultimate-a.cygames.jp/ultimate/gacha/draw_free",
+	    "draw_free": "http://ultimate-a.cygames.jp/ultimate/gacha/draw_free",
         "buy_rally_pack": "http://ultimate-a.cygames.jp/ultimate/gacha/draw_free/1"
     }
 
