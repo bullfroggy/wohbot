@@ -9,7 +9,6 @@ class Player(object):
         "name": "",
         "level": 0,
         "farm_mission": "",
-
     }
 
     def __init__(self, settings):
@@ -110,7 +109,7 @@ class Player(object):
         else:
             return False
 
-    def getRallyPoints(self):
+    def get_rally_points(self):
         html = self.woh.parse_page(self.woh.URLS['mypage'])
         if html:
             rally_text = html.select(".point")[0].get_text().strip()
@@ -118,7 +117,7 @@ class Player(object):
         else:
             return False
 
-    def CardAvailable(self):
+    def card_available(self):
         html = self.woh.parse_page(self.woh.URLS['packs'])
         if html:
             if "Daily Free Card Pack" in str(html):
@@ -128,7 +127,7 @@ class Player(object):
         else:
             return False
 
-    def buyRallyPacks(self, cart):
+    def buy_rally_packs(self, cart):
         rallyURL = self.woh.parse_page(self.woh.URLS['buy_rally_pack'])
         if rallyURL:
             for x in range(0, cart - 1):
@@ -138,7 +137,7 @@ class Player(object):
 
         return True
 
-    def freeRallyPack(self):
+    def free_rally_pack(self):
         rallyURL = self.woh.parse_page(self.woh.URLS['free_pack'])
         if rallyURL:
             self.woh.parse_page(self.woh.URLS['free_pack'])
@@ -147,9 +146,12 @@ class Player(object):
 
         return True
 
-    def rallyAll(self):
+    def rally_all(self):
         f=open('users.txt')
         for x in f:
+            if self.get_rally_points() >= 9997:
+                print "Rally point limit reached"
+                return True
             start = "http://ultimate-a.cygames.jp/ultimate/cheer/index/"
             ID = int(x)
             startU = "http://ultimate-a.cygames.jp/ultimate/profile/show/"

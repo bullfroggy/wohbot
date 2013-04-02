@@ -12,25 +12,37 @@ def main():
         "farm_mission": options.farm_mission
     }
     player = Player(player_settings)
-    points = player.getRallyPoints()
-    available = player.CardAvailable()
+    points = player.get_rally_points()
+    available = player.card_available()
     print "free card pack available:", available
-    if available:
-        player.freeRallyPack()
-    print points, "rally points"
-    print "rallying players"
-    player.rallyAll()
-    time.sleep(3)
-    points = player.getRallyPoints()
+    remainder = player.get_card_space_remaining()
+    if remainder > 0:
+        if available:
+            player.free_rally_pack()
     print points, "rally points"
     if points / 200 >= 1:
         cart = points / 200
-        print "attempting to buy", cart, "rally packs"
-        player.buyRallyPacks(cart)
+        if remainder > 0:
+            if remainder < cart:
+                cart = remainder
+            print "attempting to buy", cart, "rally packs"
+            player.buy_rally_packs(cart)
+    print "rallying players"
+    player.rally_all()
+    time.sleep(3)
+    points = player.get_rally_points()
+    print points, "rally points"
+    if points / 200 >= 1:
+        cart = points / 200
+        if remainder > 0:
+            if remainder < cart:
+                cart = remainder
+            print "attempting to buy", cart, "rally packs"
+            player.buy_rally_packs(cart)
     else:
         print "not buying"
     time.sleep(3)
-    points = player.getRallyPoints()
+    points = player.get_rally_points()
     print points, "rally points"
     print "Done!"
 
