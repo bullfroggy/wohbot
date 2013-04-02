@@ -47,10 +47,11 @@ class Player(object):
                 for card in page_cards:
                     unique_id = re.search(r"desc/(\d+)", card.get("href")).group(1)
                     if unique_id:
-                        middle_element = card.findParent("table")
-                        top_element = middle_element.findPreviousSibling("div")
-                        #print top_element
-                        rarity = re.search(r"\((\w+)\)", str(top_element.find("p"))).group(1)
+                        print "Identifying " + unique_id
+                        middle_element = card.find_parent("table")
+                        top_element = middle_element.find_previous_sibling("div")
+                        print top_element
+                        rarity = re.search(r"\((\w+)\)", top_element.find("p")[0]).group(1).strip()
                         print rarity
                         alignment = re.search(r"(\W+)", str(top_element.find("span"))).group(1)
 

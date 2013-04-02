@@ -121,9 +121,9 @@ for global_id in special_cards:
                                             usage = usage_match.group(1).encode('utf-8').strip()
 
 <<<<<<< Updated upstream
-                                    effect_found = archive_soup.find_all(text=re.compile("Effect:"), name='td')                                
+                                    effect_found = archive_soup.find_all(text=re.compile("Effect:"), name='td')
 =======
-                                    effect_found = archive_soup.find_all(text=re.compile("Effect:"), name='td')                             
+                                    effect_found = archive_soup.find_all(text=re.compile("Effect:"), name='td')
 >>>>>>> Stashed changes
                                     if effect_found:
                                         for effect_item in effect_found:
