@@ -10,6 +10,8 @@ class WoH(object):
         "mission_24": "http://ultimate-a.cygames.jp/ultimate/quest/play/2/4",
         "card_list_index": "http://ultimate-a.cygames.jp/ultimate/card_list/index/0/1/0/",
         "card_list_desc": "http://ultimate-a.cygames.jp/ultimate/card_list/desc/",
+        "fuse_base_set": "http://ultimate-a.cygames.jp/ultimate/card_union/union_change/",
+        "fuse_card_set": "http://ultimate-a.cygames.jp/ultimate/card_union/synthesis/",
     }
 
     def __init__(self, player):
@@ -21,9 +23,13 @@ class WoH(object):
         else:
             return False
 
-    def parse_page(self, url):
-        cookies = dict(sid=self.player.get_sid())
-        r = requests.get(url, cookies=cookies)
+    def parse_page(self, url, req="get", payload=dict("")):
+        cookies = dict(sid=self.get_sid())
+        if req=="get":
+            r = requests.get(url, cookies=cookies, data=payload)
+        elif req=="post":
+            r = requests.post(url, cookies=cookies, data=payload)
+
         if r.status_code == 200:
             return BeautifulSoup(r.text)
         else:

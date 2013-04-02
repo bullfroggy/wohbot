@@ -11,6 +11,7 @@ class Card(object):
         "def_pwr": None,
         "pwr_req": None,
         "silver": 0,
+        "xp": 0,
     }
 
     def __init__(self, unique_id, properties):
@@ -94,3 +95,16 @@ class Card(object):
 
     def get_silver(self):
         return self.properties["silver"]
+
+    def fuse(self, base_card, fuser_card):
+        r_set_base = self.woh.parse_page(self.woh.URLS['fuse_base_set'] + base_card)
+        if r_set_base:
+            #read page HTML to ensure base card is what we expect
+            #success!
+            r_fuse_card = self.woh.parse_page(self.woh.URLS['fuse_card_set'] + fuser_card, payload=dict('sleeve_str': fuser_card))
+            if r_fuse_card:
+                #read page HTML to get success message
+                #double success!
+
+
+

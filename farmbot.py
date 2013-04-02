@@ -10,7 +10,7 @@ def main():
     options, arguments = p.parse_args()
 
     if not options.sid:
-        print "Please Enter you SID:"
+        print "Please enter your SID:"
         options.sid = raw_input()
 
     player_settings = {

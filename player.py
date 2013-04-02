@@ -72,6 +72,19 @@ class Player(object):
 
         return
 
+    def delete_cards(self, *card_unique_ids):
+        # remove card from catalog by unique_id
+        return
+
+    def get_match_for_fuse(self):
+
+        return
+
+    def get_all_cards(self):
+        card_urls = ["http://ultimate-a.cygames.jp/ultimate/archive/view_other/00000001/"+str(page)+"/0/1/0/0/0" for page in range(0, self.get_card_count(), 10)]
+
+        return
+
     def get_sid(self):
         return self.settings["sid"]
 

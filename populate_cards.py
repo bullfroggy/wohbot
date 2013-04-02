@@ -24,13 +24,18 @@ print "global_id" + "\t" + "name" + "\t" + "name_id" + "\t" + "name_prefix" + "\
 for a in range(1,4):
     for br in range(0,6):
         for v in range(0,2):
+<<<<<<< Updated upstream
             for id in range(1,30):
+=======
+            for id in range(26,78):
+>>>>>>> Stashed changes
                 rarity = str(int(br)+int(v))
                 global_id = str(a)+rarity+str(br)+str(id).zfill(3)+str(v)
 
                 if global_id in known_globals:
                     pass
                 else:
+<<<<<<< Updated upstream
                     """
 # Begin hack to do special cards one-off
 for global_id in special_cards:
@@ -47,6 +52,9 @@ for global_id in special_cards:
 
 # End hack to do special cards one-off
                         """
+=======
+
+>>>>>>> Stashed changes
                     archive_url = "http://ultimate-a.cygames.jp/ultimate/archive/view_other/00000001/"+global_id+"/0/1/0/0/0"
                     rally_url = "http://ultimate-a.cygames.jp/ultimate/gacha/result/?t=1&c[0]="+global_id+"&s[0]=00000000001&f[0]=0&fid=0900_free_gacha.swf&effect=0&ticket_type=0&ticket_id=0&ticket_cost=0&rnd=951429010&flashParam=419722658&rnd=334048153&rnd=420997282"
 
@@ -75,7 +83,10 @@ for global_id in special_cards:
                     else:
                         archive_soup = BeautifulSoup(archive_request.text, "lxml")
                         if archive_soup.select(".userLeft"):
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
                             card_exists = True
 
                             alignment = str(a).encode('utf-8')
@@ -109,7 +120,11 @@ for global_id in special_cards:
                                         if usage_match:
                                             usage = usage_match.group(1).encode('utf-8').strip()
 
+<<<<<<< Updated upstream
                                     effect_found = archive_soup.find_all(text=re.compile("Effect:"), name='td')                                
+=======
+                                    effect_found = archive_soup.find_all(text=re.compile("Effect:"), name='td')                             
+>>>>>>> Stashed changes
                                     if effect_found:
                                         for effect_item in effect_found:
                                             for effect_sibling in effect_item.find_parent("table").find_all("td"):
