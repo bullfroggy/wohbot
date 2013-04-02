@@ -30,7 +30,7 @@ def main():
         if remainder > 0:
             if remainder < cart:
                 cart = remainder
-            print "attempting to buy", cart, "rally packs"
+            print "Attempting to buy", cart, "rally packs"
             player.buy_rally_packs(cart)
             points = player.get_rally_points()
             print points, "rally points"
