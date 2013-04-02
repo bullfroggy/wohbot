@@ -2,6 +2,7 @@ import optparse
 from player import Player
 import time
 
+
 def main():
     p = optparse.OptionParser()
     p.add_option('--sid', '-s', default="")
@@ -14,12 +15,16 @@ def main():
     player = Player(player_settings)
     points = player.get_rally_points()
     available = player.card_available()
-    print "free card pack available:", available
+    points = player.get_rally_points()
+    print points, "rally points"
+    print "Free card pack available:", available
     remainder = player.get_card_space_remaining()
-    if remainder > 0:
-        if available:
+    if available:
+        if remainder > 0:
             player.free_rally_pack()
-    print points, "rally points"
+        else:
+            print "No remaining card space"
+    remainder = player.get_card_space_remaining()
     if points / 200 >= 1:
         cart = points / 200
         if remainder > 0:
@@ -27,23 +32,26 @@ def main():
                 cart = remainder
             print "attempting to buy", cart, "rally packs"
             player.buy_rally_packs(cart)
-    print "rallying players"
+            points = player.get_rally_points()
+            print points, "rally points"
+    print "Rallying players"
     player.rally_all()
-    time.sleep(3)
+    #time.sleep(3)
     points = player.get_rally_points()
     print points, "rally points"
+    remainder = player.get_card_space_remaining()
     if points / 200 >= 1:
         cart = points / 200
         if remainder > 0:
             if remainder < cart:
                 cart = remainder
-            print "attempting to buy", cart, "rally packs"
+            print "Attempting to buy", cart, "rally packs"
             player.buy_rally_packs(cart)
+            points = player.get_rally_points()
+            print points, "rally points"
     else:
-        print "not buying"
-    time.sleep(3)
-    points = player.get_rally_points()
-    print points, "rally points"
+        print "Not buying"
+    #time.sleep(3)
     print "Done!"
 
 if __name__ == '__main__':

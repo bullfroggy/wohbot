@@ -118,13 +118,14 @@ class Player(object):
             return False
 
     def card_available(self):
-        html = self.woh.parse_page(self.woh.URLS['packs'])
+        html = self.woh.parse_page(self.woh.URLS['mypage'])
         if html:
-            if "Daily Free Card Pack" in str(html):
+            if "Free Card Pack Available!" in str(html):
                 return True
             else:
                 return False
         else:
+            print "cannot parse"
             return False
 
     def buy_rally_packs(self, cart):
@@ -138,9 +139,9 @@ class Player(object):
         return True
 
     def free_rally_pack(self):
-        rallyURL = self.woh.parse_page(self.woh.URLS['free_pack'])
+        rallyURL = self.woh.parse_page(self.woh.URLS['draw_free'])
         if rallyURL:
-            self.woh.parse_page(self.woh.URLS['free_pack'])
+            self.woh.parse_page(self.woh.URLS['draw_free'])
         else:
             return False
 
@@ -180,3 +181,4 @@ class Player(object):
             else:
                 return False
         return True
+
