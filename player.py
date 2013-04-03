@@ -50,16 +50,22 @@ class Player(object):
                         print "Identifying " + unique_id
                         middle_element = card.find_parent("table")
                         top_element = middle_element.find_previous_sibling("div")
-                        print top_element
-                        rarity = re.search(r"\((\w+)\)", top_element.find("p")[0]).group(1).strip()
-                        print rarity
-                        alignment = re.search(r"(\W+)", str(top_element.find("span"))).group(1)
+
+                        rarity = re.search(r"\(([\s\w]+)\)", top_element.find("p").get_text()).group(1).strip()
+                        alignment = re.search(r"([A-Z]+)", top_element.find("span").get_text()).group(1).strip()
+                        #img_id = re.search(r"([A-Z]+)", top_element.find("span").get_text()).group(1).strip()
+                        img_id = re.search(r"\/card\/\w+\/([a-f0-9]+)\.jpg", middle_element.find("img").get("src").encode('utf-8').strip()).group(1)
+                        #level =  re.search(r"Lv:\s+(\d+)\/\d+", middle_element.find("td", text="Lv:").get_text().encode('utf-8').strip()).group(1)
+                        print level
 
                         properties = {
                             "rarity": rarity,
                             "alignment": alignment,
+                            "img_id": img_id,
 
                         }
+
+                        print properties
                         #curr_card =
 
                         #print curr_card.get_unique_id()
