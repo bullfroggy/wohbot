@@ -2,7 +2,6 @@ import re
 from card import Card
 from woh import WoH
 
-
 class Player(object):
     settings = {
         "sid": "",
@@ -52,16 +51,44 @@ class Player(object):
                         top_element = middle_element.find_previous_sibling("div")
 
                         rarity = re.search(r"\(([\s\w]+)\)", top_element.find("p").get_text()).group(1).strip()
+
+                        if "Common" in rarity:
+                            rarity = 0
+                        elif "Uncommon" in rarity:
+                            rarity = 1
+                        elif "Rare" in rarity:
+                            rarity = 2
+                        elif "S Rare" in rarity:
+                            rarity = 3
+                        elif "SS Rare" in rarity:
+                            rarity = 4
+                        elif "U Rare" in rarity:
+                            rarity = 5
+                        elif "Legendary" in rarity:
+                            rarity = 6
+                        else:
+                            rarity = -1
+
+
                         alignment = re.search(r"([A-Z]+)", top_element.find("span").get_text()).group(1).strip()
-                        #img_id = re.search(r"([A-Z]+)", top_element.find("span").get_text()).group(1).strip()
-                        img_id = re.search(r"\/card\/\w+\/([a-f0-9]+)\.jpg", middle_element.find("img").get("src").encode('utf-8').strip()).group(1)
-                        #level =  re.search(r"Lv:\s+(\d+)\/\d+", middle_element.find("td", text="Lv:").get_text().encode('utf-8').strip()).group(1)
-                        print level
+
+                        if "SPEED" in alignment:
+                            alignment = 1
+                        elif "BRUISER" in alignment:
+                            alignment = 2
+                        elif "TACTICS" in alignment:
+                            alignment = 3
+                        else:
+                            alignment = 0
+
+                        img_id = re.search(r"\/card\/\w+\/([a-f0-9]+)\.jpg", middle_element.find("img").get("src").strip()).group(1)
+                        level =  int(re.search(r"Lv:\s+(\d+)\/\d+", middle_element.get_text().strip()).group(1))
 
                         properties = {
                             "rarity": rarity,
                             "alignment": alignment,
                             "img_id": img_id,
+                            "level": level,
 
                         }
 
@@ -75,7 +102,7 @@ class Player(object):
         new_roster = list(set(new_roster))
 
         for each_card in new_roster:
-            print each_card.get_alignment()
+            print each_card.get_img_id()
 
         return
 

@@ -1,4 +1,14 @@
-class Card(object):
+class CommonEqualityMixin(object):
+
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__)
+            and self.get_unique_id() == other.get_unique_id())
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+class Card(CommonEqualityMixin):
+    unique_id = None
     properties = {
         "global_id": "",
         "img_id": "",
