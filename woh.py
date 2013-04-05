@@ -12,7 +12,8 @@ class WoH(object):
         "card_list_desc": "http://ultimate-a.cygames.jp/ultimate/card_list/desc/",
         "packs": "http://ultimate-a.cygames.jp/ultimate/gacha/index/0",
 	    "draw_free": "http://ultimate-a.cygames.jp/ultimate/gacha/draw_free",
-        "buy_rally_pack": "http://ultimate-a.cygames.jp/ultimate/gacha/draw_free/1"
+        "buy_rally_pack": "http://ultimate-a.cygames.jp/ultimate/gacha/draw_free/1",
+        "friend_list": "http://ultimate-a.cygames.jp/ultimate/friend?p="
     }
 
     def __init__(self, player):
@@ -25,8 +26,9 @@ class WoH(object):
             return False
 
     def parse_page(self, url):
+        user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
         cookies = dict(sid=self.player.get_sid())
-        r = requests.get(url, cookies=cookies)
+        r = requests.get(url, cookies=cookies, headers=user_agent)
         if r.status_code == 200:
             return BeautifulSoup(r.text)
         else:

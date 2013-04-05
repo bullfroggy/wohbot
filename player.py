@@ -2,6 +2,8 @@ import re
 from card import Card
 from woh import WoH
 import time
+import requests
+
 
 class Player(object):
     settings = {
@@ -109,6 +111,19 @@ class Player(object):
         else:
             return False
 
+    def get_team_list(self):
+        count = 0
+        html = self.woh.parse_page(self.woh.URLS['friend_list'])
+        if html:
+            print str(html)
+            for line in str(html):
+                if "ultimate/cheer/index" in line:
+                    count += 1
+        else:
+            return False
+        print count
+
+
     def get_rally_points(self):
         html = self.woh.parse_page(self.woh.URLS['mypage'])
         if html:
@@ -135,7 +150,6 @@ class Player(object):
                 self.woh.parse_page(self.woh.URLS['buy_rally_pack'])
         else:
             return False
-
         return True
 
     def free_rally_pack(self):
@@ -144,41 +158,166 @@ class Player(object):
             self.woh.parse_page(self.woh.URLS['draw_free'])
         else:
             return False
-
         return True
 
     def rally_all(self):
         f=open('users.txt')
         for x in f:
-            if self.get_rally_points() >= 9997:
+            if self.get_rally_points() >= 9995:
                 print "Rally point limit reached"
                 return True
             start = "http://ultimate-a.cygames.jp/ultimate/cheer/index/"
             ID = int(x)
-            startU = "http://ultimate-a.cygames.jp/ultimate/profile/show/"
             URL = start + str(ID)
-            userURL = startU + str(ID)
-            self.woh.URLS['rally_rand'] = URL
-            self.woh.URLS['user_page'] = userURL
-            userPage = self.woh.parse_page(userURL)
             #time.sleep(1)
-            if userPage:
-                if "An error has been detected" not in str(userPage):
-                    print ID
-                    rallyURL = self.woh.parse_page(URL)
-                    #time.sleep(1)
-                    if "Received 4 Rally Points!" in str(rallyURL):
-                        print "Successfully rallied user"
-                    else:
-                        print "Could not rally user"
-                        if "Your Rally has reached maximum limit" in str(rallyURL):
-                            print "Maximum rally limit reached"
-                            return True
-                        if "excessive tapping" in str(userPage):
-                            print "Too many taps"
-                        if "excessive tapping" in str(rallyURL):
-                            print "Too many taps"
+            print ID
+            rallyURL = self.woh.parse_page(URL)
+            #time.sleep(1)
+            if "You rallied" in str(rallyURL):
+                print "Successfully rallied user"
             else:
-                return False
+                print "Could not rally user"
+                if "Your Rally has reached maximum limit" in str(rallyURL):
+                    print "Maximum rally limit reached"
+                    return True
+                if "excessive tapping" in str(rallyURL):
+                    print "Too many taps"
         return True
 
+    def rally_friends(self):
+        f = self.get_friend_list()
+        for x in f:
+            if self.get_rally_points() >= 9995:
+                print "Rally point limit reached"
+                return True
+            start = "http://ultimate-a.cygames.jp/ultimate/cheer/index/"
+            ID = int(x)
+            URL = start + str(ID)
+            #time.sleep(1)
+            print ID
+            rallyURL = self.woh.parse_page(URL)
+            #time.sleep(1)
+            if "You rallied" in str(rallyURL):
+                print "Successfully rallied user"
+            else:
+                print "Could not rally user"
+                if "Your Rally has reached maximum limit" in str(rallyURL):
+                    print "Maximum rally limit reached"
+                    return True
+                if "excessive tapping" in str(rallyURL):
+                    print "Too many taps"
+        return True
+
+    def get_friend_num(self):
+        html = self.woh.parse_page(self.woh.URLS['mypage'])
+        if html:
+            friend_text = html.select(".team")[0].get_text().strip().split('/')[0]
+            return int(friend_text)
+        else:
+            return False
+
+    def get_friend_list(self):
+        list = []
+        for x in range(0, (self.get_friend_num() / 5) + 1):
+            start = "http://ultimate-a.cygames.jp/ultimate/friend?p="
+            ID = x + 1
+            URL = start + str(ID)
+            friendURL = self.woh.parse_page(URL)
+            if friendURL:
+                lines = str(friendURL).splitlines()
+                for line in lines:
+                    if "ultimate/profile/show" in line:
+                        user = line.split('/')[6].split('?')[0]
+                        list.append(user)
+        return list
+
+    def message_friends(self):
+        f = self.get_friend_list()
+        p = self.get_rally_points()
+        for x in f:
+            if p >= 9989:
+                print "Rally point limit reached"
+                return True
+            start = "http://ultimate-a.cygames.jp/ultimate/cheer/index/"
+            ID = int(x)
+            URL = start + str(ID)
+            #time.sleep(1)
+            print ID
+            rallyURL = self.woh.parse_page(URL)
+            #time.sleep(1)
+            if "You rallied" in str(rallyURL):
+                print "Successfully rallied user"
+            else:
+                print "Could not rally user"
+                if "Your Rally has reached maximum limit" in str(rallyURL):
+                    print "Maximum rally limit reached"
+                    return True
+                if "excessive tapping" in str(rallyURL):
+                    print "Too many taps"
+            lines = str(rallyURL).splitlines()
+            mess = ""
+            for line in lines:
+                if 'name="message_id"' in line:
+                    mess = line.split('"')[5]
+                if "ultimate/cheer/comment_check" in line:
+                    p = self.get_rally_points()
+                    rand = line.split('"')[1]
+                    cookies = dict(sid='a725a78705d1be7223be9e3af16a3232')
+                    user_agent = {'User-agent': 'Mozilla/5.0'}
+                    payload = {'message': 'rally!', 'sort': '1', 'to_viewer_id': x, 'bef_friendship_point': p, 'aft_friendship_point': p, 'is_message': '0', 'is_cheer': '0', 'is_error': '0', 'ret_act': '0', 'message_id': mess, 'page': '0', 'offset': '0'}
+                    r = requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+                    morelines = r.text.splitlines()
+                    for line in morelines:
+                        if "ultimate/cheer/send_check" in line:
+                            rand = line.split("'")[1]
+                            cookies = dict(sid='a725a78705d1be7223be9e3af16a3232')
+                            user_agent = {'User-agent': 'Mozilla/5.0'}
+                            payload = {'to_viewer_id': x, 'ret_act': '0', 'message_id': "", 'sort': '1', 'page': '0'}
+                            requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+        return True
+
+    def message_all(self):
+        f = open('users.txt')
+        p = self.get_rally_points()
+        for x in f:
+            if p >= 9995:
+                print "Rally point limit reached"
+                return True
+            start = "http://ultimate-a.cygames.jp/ultimate/cheer/index/"
+            ID = int(x)
+            URL = start + str(ID)
+            #time.sleep(1)
+            print ID
+            rallyURL = self.woh.parse_page(URL)
+            #time.sleep(1)
+            if "You rallied" in str(rallyURL):
+                print "Successfully rallied user"
+            else:
+                print "Could not rally user"
+                if "Your Rally has reached maximum limit" in str(rallyURL):
+                    print "Maximum rally limit reached"
+                    return True
+                if "excessive tapping" in str(rallyURL):
+                    print "Too many taps"
+            lines = str(rallyURL).splitlines()
+            mess = ""
+            for line in lines:
+                if 'name="message_id"' in line:
+                    mess = line.split('"')[5]
+                if "ultimate/cheer/comment_check" in line:
+                    p = self.get_rally_points()
+                    rand = line.split('"')[1]
+                    cookies = dict(sid='a725a78705d1be7223be9e3af16a3232')
+                    user_agent = {'User-agent': 'Mozilla/5.0'}
+                    payload = {'message': 'rally!', 'sort': '1', 'to_viewer_id': x, 'bef_friendship_point': p, 'aft_friendship_point': p, 'is_message': '0', 'is_cheer': '0', 'is_error': '0', 'ret_act': '0', 'message_id': mess, 'page': '0', 'offset': '0'}
+                    r = requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+                    morelines = r.text.splitlines()
+                    for line in morelines:
+                        if "ultimate/cheer/send_check" in line:
+                            rand = line.split("'")[1]
+                            print rand
+                            cookies = dict(sid='a725a78705d1be7223be9e3af16a3232')
+                            user_agent = {'User-agent': 'Mozilla/5.0'}
+                            payload = {'to_viewer_id': x, 'ret_act': '0', 'message_id': "", 'sort': '1', 'page': '0'}
+                            requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+        return True
