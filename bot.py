@@ -12,8 +12,6 @@ class Bot(object):
         self.player = self.settings["player"]
         self.woh = WoH(self.player)
 
-    def update_roster(self):
-        return self.player.update_cards()
 
     def farm(self, iterations):
         mission_url = self.player.get_farm_url()
@@ -82,7 +80,7 @@ class Bot(object):
                         # read HTML to confirm base is right
                         pass
 
-        self.player.update_cards()
+        self.player.update_roster()
 
         return
 
@@ -111,6 +109,6 @@ class Bot(object):
 
                     #success!
 
-                    self.update_cards()
+                    self.player.update_roster()
 
         return base_card

@@ -12,6 +12,7 @@ class Card(CommonEqualityMixin):
     properties = {
         "global_id": "",
         "img_id": "",
+        "name": "",
         "alignment": 1,
         "rarity": 0,
         "max_level": 99,
@@ -42,6 +43,9 @@ class Card(CommonEqualityMixin):
 
     def set_img_id(self, img_id):
         self.properties.update({"img_id": img_id})
+
+    def set_name(self, img_id):
+        self.properties.update({"name": name})
 
     def set_rarity(self, rarity):
         self.properties.update({"rarity": rarity})
@@ -75,6 +79,9 @@ class Card(CommonEqualityMixin):
 
     def get_img_id(self):
         return self.properties["img_id"]
+
+    def get_name(self):
+        return self.properties["name"]
 
     def get_unique_id(self):
         return self.unique_id

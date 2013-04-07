@@ -1,4 +1,4 @@
-import re
+import re, copy
 from card import Card
 from woh import WoH
 
@@ -13,7 +13,7 @@ class Player(object):
 
     def __init__(self, settings):
         self.settings.update(settings)
-        self.catalog = [] # populate via update_cards method
+        self.roster = [] # populate via update_cards method
         self.presents = []
         self.device_presents = []
         self.pending_trades = []
@@ -33,76 +33,61 @@ class Player(object):
         else:
             return 0
 
-    def update_cards(self):
+    def update_roster(self):
         new_roster = []
         card_list_urls = [self.woh.URLS['card_list_index'] + str(page) for page in range(0, self.get_card_count(), 10)]
+        print "Getting " + str(self.get_card_count()) + " cards..."
         for url in card_list_urls:
             print "Walking " + url + "..."
             html = self.woh.parse_page(url)
             if html:
-                page_cards = html.select("a[href^=" + self.woh.URLS['card_list_desc'] + "]")
+                #page_cards = html.select("a[href^=" + self.woh.URLS['card_list_desc'] + "]")
+                page_cards = html.select("a[href^=" + self.woh.URLS['card_list_desc'] + "] img")
                 #page_cards = html.select(".member_bg>div+table~table")
 
                 for card in page_cards:
-                    unique_id = re.search(r"desc/(\d+)", card.get("href")).group(1)
-                    if unique_id:
-                        print "Identifying " + unique_id
+                    level = ""
+
+                    image_id = re.search(r"\/card\/\w+\/([a-f0-9]+)\.jpg", card.get("src").strip()).group(1)
+                    unique_id = re.search(r"desc/(\d+)", card.find_parent("a").get("href")).group(1)
+                    if image_id and unique_id:
+                        #print "Identifying " + unique_id + " with " + image_id
+
+                        global_properties = self.woh.parse_card_json(image_id)
+                        # print global_properties
+
                         middle_element = card.find_parent("table")
-                        top_element = middle_element.find_previous_sibling("div")
+                        #print(middle_element.encode('utf-8'))
+                        lvl_element = middle_element.find(name="span", text=re.compile(r"Lv:"))
+                        if lvl_element:
+                            level_data = lvl_element.find_next_sibling(text=re.compile(r"(\d+)\/\d+"))
 
-                        rarity = re.search(r"\(([\s\w]+)\)", top_element.find("p").get_text()).group(1).strip()
-
-                        if "Common" in rarity:
-                            rarity = 0
-                        elif "Uncommon" in rarity:
-                            rarity = 1
-                        elif "Rare" in rarity:
-                            rarity = 2
-                        elif "S Rare" in rarity:
-                            rarity = 3
-                        elif "SS Rare" in rarity:
-                            rarity = 4
-                        elif "U Rare" in rarity:
-                            rarity = 5
-                        elif "Legendary" in rarity:
-                            rarity = 6
-                        else:
-                            rarity = -1
-
-
-                        alignment = re.search(r"([A-Z]+)", top_element.find("span").get_text()).group(1).strip()
-
-                        if "SPEED" in alignment:
-                            alignment = 1
-                        elif "BRUISER" in alignment:
-                            alignment = 2
-                        elif "TACTICS" in alignment:
-                            alignment = 3
-                        else:
-                            alignment = 0
-
-                        img_id = re.search(r"\/card\/\w+\/([a-f0-9]+)\.jpg", middle_element.find("img").get("src").strip()).group(1)
-                        level =  int(re.search(r"Lv:\s+(\d+)\/\d+", middle_element.get_text().strip()).group(1))
+                            level =  int(re.search(r"(\d+)\/\d+", level_data.strip()).group(1))
 
                         properties = {
-                            "rarity": rarity,
-                            "alignment": alignment,
-                            "img_id": img_id,
+                            "rarity": global_properties["rarity"],
+                            "alignment": global_properties["alignment"],
+                            "img_id": image_id,
                             "level": level,
+                            "global_id": global_properties["global_id"],
+                            "name": global_properties["name"],
 
                         }
 
-                        print properties
+                        #print str(properties).encode('utf-8')
                         #curr_card =
 
                         #print curr_card.get_unique_id()
+                        print "about to append " + global_properties["name"]
+                        card_to_append = copy.deepcopy(Card(unique_id, properties))
 
-                        new_roster.append(Card(unique_id, properties))
+                        new_roster.append(card_to_append)
+                        print "2nd-to-last-card = " + new_roster[len(new_roster)-2].get_name()
 
-        new_roster = list(set(new_roster))
+        #new_roster = list(set(new_roster))
 
         for each_card in new_roster:
-            print each_card.get_img_id()
+            print each_card.get_name()
 
         return
 
