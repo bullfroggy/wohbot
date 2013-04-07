@@ -27,6 +27,27 @@ class Bot(object):
 
         return True
 
+    def farm_mission(self, mission_url):
+        self.woh.parse_page(mission_url)
+        return True
+
+    def farm_newest_mission(self):
+        operation, mission = self.player.get_newest_mission()
+        # Only Farm the Mission if you have enough energy for at least one attack
+        if mission != "boss":
+            if self.player.get_remaining_energy() > operation - 1:
+                self.farm_mission(self.woh.get_mission_url(operation, mission))
+                return True
+            else:
+                return False
+        else:
+            self.farm_mission(self.woh.get_mission_url(operation, mission))
+            return True
+
+    def max_farm_newest_mission(self):
+        while self.farm_newest_mission():
+            print "Farmed"
+
     def max_farm(self):
         required_battles = int(self.player.get_remaining_energy() / 3)
         self.farm(required_battles)

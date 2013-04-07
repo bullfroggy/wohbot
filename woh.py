@@ -13,6 +13,7 @@ class WoH(object):
         "fuse_eligible_list": "http://ultimate-a.cygames.jp/ultimate/card_union/union_card/%s/1/0/",
         "fuse_base_set": "http://ultimate-a.cygames.jp/ultimate/card_union/union_change/",
         "fuse_card_set": "http://ultimate-a.cygames.jp/ultimate/card_union/synthesis/",
+        "quest_index": "http://ultimate-a.cygames.jp/ultimate/quest",
     }
 
     def __init__(self, player):
@@ -23,6 +24,12 @@ class WoH(object):
             return self.URLS[url]
         else:
             return False
+
+    def get_mission_url(self, operation, mission):
+        if mission == "boss":
+            return "http://ultimate-a.cygames.jp/ultimate/quest_boss/result/%d/1/0" % operation
+        else:
+            return "http://ultimate-a.cygames.jp/ultimate/quest/play/%d/%d" % (operation, mission)
 
     def parse_page(self, url, req="get", payload=dict("")):
         cookies = dict(sid=self.player.get_sid())
