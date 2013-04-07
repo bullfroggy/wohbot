@@ -48,9 +48,10 @@ class Bot(object):
         while self.farm_newest_mission():
             print "Farmed"
 
-    def max_farm(self):
+    def max_farm(self, operation, mission):
         required_battles = int(self.player.get_remaining_energy() / 3)
-        self.farm(required_battles)
+        for x in range(0, required_battles):
+            self.farm_mission(self.woh.get_mission_url(operation, mission))
 
         # fuse_alignment correlates to database alignments. 0 is any, 1 is speed, 2 is bruiser, 3 is tactics
     def smart_fuse(self, fuse_rarity=1, fuse_alignment=0, max_fuse_level=0):
