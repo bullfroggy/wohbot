@@ -15,6 +15,29 @@ class WoH(object):
         "fuse_card_set": "http://ultimate-a.cygames.jp/ultimate/card_union/synthesis/",
         "quest_index": "http://ultimate-a.cygames.jp/ultimate/quest",
     }
+    OPERATION_ENERGY_COST = {
+        1: 1,
+        2: 1,
+        3: 2,
+        4: 3,
+        5: 4,
+        6: 5,
+        7: 6,
+        8: 7,
+        9: 8,
+        10: 9,
+        11: 10,
+        12: 11,
+        13: 12,
+        14: 10,
+        15: 11,
+        16: 12,
+        17: 13,
+        18: 10,
+        19: 11,
+        20: 12,
+        21: 13,
+    }
 
     def __init__(self, player):
         self.player = player

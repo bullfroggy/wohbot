@@ -35,7 +35,7 @@ class Bot(object):
         operation, mission = self.player.get_newest_mission()
         # Only Farm the Mission if you have enough energy for at least one attack
         if mission != "boss":
-            if self.player.get_remaining_energy() > operation - 1:
+            if self.player.get_remaining_energy() >= self.woh.OPERATION_ENERGY_COST[operation]:
                 self.farm_mission(self.woh.get_mission_url(operation, mission))
                 return True
             else:
