@@ -231,18 +231,26 @@ class Player(object):
                         list.append(user)
         return list
 
+    def get_randoms(self):
+        f = self.get_friend_num()
+        friendRallies = f * 12 * 2
+        randRallies = 500 - friendRallies
+        runRand = (randRallies / 12)
+        return runRand
+
     def message_friends(self):
         f = self.get_friend_list()
-        p = self.get_rally_points()
         for x in f:
-            if p >= 9989:
+            p = self.get_rally_points()
+            print p, "rally points"
+            if p >= 9981:
                 print "Rally point limit reached"
                 return True
             start = "http://ultimate-a.cygames.jp/ultimate/cheer/index/"
             ID = int(x)
             URL = start + str(ID)
             #time.sleep(1)
-            print ID
+            print "Rallying user", ID
             rallyURL = self.woh.parse_page(URL)
             #time.sleep(1)
             if "You rallied" in str(rallyURL):
@@ -254,70 +262,80 @@ class Player(object):
                     return True
                 if "excessive tapping" in str(rallyURL):
                     print "Too many taps"
-            lines = str(rallyURL).splitlines()
-            mess = ""
-            for line in lines:
-                if 'name="message_id"' in line:
-                    mess = line.split('"')[5]
-                if "ultimate/cheer/comment_check" in line:
-                    p = self.get_rally_points()
-                    rand = line.split('"')[1]
-                    cookies = dict(sid='a725a78705d1be7223be9e3af16a3232')
-                    user_agent = {'User-agent': 'Mozilla/5.0'}
-                    payload = {'message': 'rally!', 'sort': '1', 'to_viewer_id': x, 'bef_friendship_point': p, 'aft_friendship_point': p, 'is_message': '0', 'is_cheer': '0', 'is_error': '0', 'ret_act': '0', 'message_id': mess, 'page': '0', 'offset': '0'}
-                    r = requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
-                    morelines = r.text.splitlines()
-                    for line in morelines:
-                        if "ultimate/cheer/send_check" in line:
-                            rand = line.split("'")[1]
-                            cookies = dict(sid='a725a78705d1be7223be9e3af16a3232')
-                            user_agent = {'User-agent': 'Mozilla/5.0'}
-                            payload = {'to_viewer_id': x, 'ret_act': '0', 'message_id': "", 'sort': '1', 'page': '0'}
-                            requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+            if "12 Rally Points by sending a message!" in str(rallyURL):
+                lines = str(rallyURL).splitlines()
+                mess = ""
+                for line in lines:
+                    if 'name="message_id"' in line:
+                        mess = line.split('"')[5]
+                    if "ultimate/cheer/comment_check" in line:
+                        p = self.get_rally_points()
+                        rand = line.split('"')[1]
+                        cookies = dict(sid=self.get_sid())
+                        user_agent = {'User-agent': 'Mozilla/5.0'}
+                        payload = {'message': 'rally!', 'sort': '1', 'to_viewer_id': x, 'bef_friendship_point': p, 'aft_friendship_point': p, 'is_message': '0', 'is_cheer': '0', 'is_error': '0', 'ret_act': '0', 'message_id': mess, 'page': '0', 'offset': '0'}
+                        r = requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+                        moreLines = r.text.splitlines()
+                        for line in moreLines:
+                            if "ultimate/cheer/send_check" in line:
+                                rand = line.split("'")[1]
+                                cookies = dict(sid=self.get_sid())
+                                user_agent = {'User-agent': 'Mozilla/5.0'}
+                                payload = {'to_viewer_id': x, 'ret_act': '0', 'message_id': "", 'sort': '1', 'page': '0'}
+                                requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+                                print "Sending message"
         return True
 
     def message_all(self):
         f = open('users.txt')
-        p = self.get_rally_points()
+        r = self.get_randoms()
+        count = 0
         for x in f:
-            if p >= 9995:
-                print "Rally point limit reached"
-                return True
-            start = "http://ultimate-a.cygames.jp/ultimate/cheer/index/"
-            ID = int(x)
-            URL = start + str(ID)
-            #time.sleep(1)
-            print ID
-            rallyURL = self.woh.parse_page(URL)
-            #time.sleep(1)
-            if "You rallied" in str(rallyURL):
-                print "Successfully rallied user"
-            else:
-                print "Could not rally user"
-                if "Your Rally has reached maximum limit" in str(rallyURL):
-                    print "Maximum rally limit reached"
+            if count <= r:
+                p = self.get_rally_points()
+                print p, "rally points"
+                if p >= 9991:
+                    print "Rally point limit reached"
                     return True
-                if "excessive tapping" in str(rallyURL):
-                    print "Too many taps"
-            lines = str(rallyURL).splitlines()
-            mess = ""
-            for line in lines:
-                if 'name="message_id"' in line:
-                    mess = line.split('"')[5]
-                if "ultimate/cheer/comment_check" in line:
-                    p = self.get_rally_points()
-                    rand = line.split('"')[1]
-                    cookies = dict(sid='a725a78705d1be7223be9e3af16a3232')
-                    user_agent = {'User-agent': 'Mozilla/5.0'}
-                    payload = {'message': 'rally!', 'sort': '1', 'to_viewer_id': x, 'bef_friendship_point': p, 'aft_friendship_point': p, 'is_message': '0', 'is_cheer': '0', 'is_error': '0', 'ret_act': '0', 'message_id': mess, 'page': '0', 'offset': '0'}
-                    r = requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
-                    morelines = r.text.splitlines()
-                    for line in morelines:
-                        if "ultimate/cheer/send_check" in line:
-                            rand = line.split("'")[1]
-                            print rand
-                            cookies = dict(sid='a725a78705d1be7223be9e3af16a3232')
+                start = "http://ultimate-a.cygames.jp/ultimate/cheer/index/"
+                ID = int(x)
+                URL = start + str(ID)
+                #time.sleep(1)
+                print "Rallying user", ID
+                rallyURL = self.woh.parse_page(URL)
+                #time.sleep(1)
+                if "You rallied" in str(rallyURL):
+                    print "Successfully rallied user"
+                    count += 1
+                else:
+                    print "Could not rally user"
+                    if "Your Rally has reached maximum limit" in str(rallyURL):
+                        print "Maximum rally limit reached"
+                        return True
+                    if "excessive tapping" in str(rallyURL):
+                        print "Too many taps"
+                if "6 Rally Points by sending a message!" in str(rallyURL):
+                    lines = str(rallyURL).splitlines()
+                    mess = ""
+                    for line in lines:
+                        if 'name="message_id"' in line:
+                            mess = line.split('"')[5]
+                        if "ultimate/cheer/comment_check" in line:
+                            p = self.get_rally_points()
+                            rand = line.split('"')[1]
+                            cookies = dict(sid=self.get_sid())
                             user_agent = {'User-agent': 'Mozilla/5.0'}
-                            payload = {'to_viewer_id': x, 'ret_act': '0', 'message_id': "", 'sort': '1', 'page': '0'}
-                            requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+                            payload = {'message': 'rally!', 'sort': '1', 'to_viewer_id': x, 'bef_friendship_point': p, 'aft_friendship_point': p, 'is_message': '0', 'is_cheer': '0', 'is_error': '0', 'ret_act': '0', 'message_id': mess, 'page': '0', 'offset': '0'}
+                            r = requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+                            moreLines = r.text.splitlines()
+                            for line in moreLines:
+                                if "ultimate/cheer/send_check" in line:
+                                    rand = line.split("'")[1]
+                                    cookies = dict(sid=self.get_sid())
+                                    user_agent = {'User-agent': 'Mozilla/5.0'}
+                                    payload = {'to_viewer_id': x, 'ret_act': '0', 'message_id': "", 'sort': '1', 'page': '0'}
+                                    requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+                                    print "Sending message"
+                                    count += 1
+            return False
         return True
