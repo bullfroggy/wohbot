@@ -2,7 +2,7 @@ To run rallybot:
 
     Ensure requirements on requirements.txt are satisfied
     Navigate to repository directory in terminal
-    Enter command "python rallybot.py -s your_sid"
+    Enter command "python rallybot.py -s 'your_sid'"
 
     Rallybot should be run every 2 hours, 5 minutes.
     This can be done using a cronjob.
