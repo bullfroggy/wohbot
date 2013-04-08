@@ -1,5 +1,6 @@
 import optparse
 from player import Player
+from bot import Bot
 import time
 
 
@@ -13,6 +14,10 @@ def main():
         "farm_mission": options.farm_mission
     }
     player = Player(player_settings)
+    bot_settings = {
+        "player": player
+    }
+    bot = Bot(bot_settings)
     available = player.card_available()
     points = player.get_rally_points()
     print points, "rally points"
@@ -20,7 +25,7 @@ def main():
     remainder = player.get_card_space_remaining()
     if available:
         if remainder > 0:
-            player.free_rally_pack()
+            bot.get_free_pack()
         else:
             print "No remaining card space"
     remainder = player.get_card_space_remaining()
@@ -30,14 +35,14 @@ def main():
             if remainder < cart:
                 cart = remainder
             print "Attempting to buy", cart, "rally packs"
-            player.buy_rally_packs(cart)
+            bot.buy_rally_packs(cart)
             points = player.get_rally_points()
             print points, "rally points"
         print "Rallying Players"
-    player.message_friends()
+    bot.message_friends()
     points = player.get_rally_points()
     print points, "rally points"
-    player.message_all()
+    bot.message_randoms()
     points = player.get_rally_points()
     print points, "rally points"
     remainder = player.get_card_space_remaining()
@@ -47,7 +52,7 @@ def main():
             if remainder < cart:
                 cart = remainder
             print "Attempting to buy", cart, "rally packs"
-            player.buy_rally_packs(cart)
+            bot.buy_rally_packs(cart)
             points = player.get_rally_points()
             print points, "rally points"
     else:
