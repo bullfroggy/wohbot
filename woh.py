@@ -8,12 +8,12 @@ class WoH(object):
         "fusion": "http://ultimate-a.cygames.jp/ultimate/card_union",
         "mission_23": "http://ultimate-a.cygames.jp/ultimate/quest/play/2/3",
         "mission_24": "http://ultimate-a.cygames.jp/ultimate/quest/play/2/4",
-        "card_list_index": "http://ultimate-a.cygames.jp/ultimate/card_list/index/0/1/1/",
+        "card_list_index": "http://ultimate-a.cygames.jp/ultimate/card_list/index/%d/0/0/%d",
         "card_list_desc": "http://ultimate-a.cygames.jp/ultimate/card_list/desc/",
-        "fuse_eligible_list": "http://ultimate-a.cygames.jp/ultimate/card_union/union_card/%s/1/0/",
+        "fuse_eligible_list": "http://ultimate-a.cygames.jp/ultimate/card_union/union_card/%d/1/0/",
         "fuse_base_set": "http://ultimate-a.cygames.jp/ultimate/card_union/union_change/",
         "fuse_card_set": "http://ultimate-a.cygames.jp/ultimate/card_union/synthesis/",
-        "card_api": "http://mmheroes.herokuapp.com/api/v1/cards/",
+        "card_api": "http://rpgotg.herokuapp.com/api/v1/cards/",
     }
 
     def __init__(self, player):

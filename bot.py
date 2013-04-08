@@ -31,13 +31,13 @@ class Bot(object):
 
         # fuse_alignment correlates to database alignments. 0 is any, 1 is speed, 2 is bruiser, 3 is tactics
     def smart_fuse(self, fuse_rarity=1, fuse_alignment=0, max_fuse_level=0):
-        fuse_card_list_url = str(self.woh.URLS['fuse_eligible_list']).replace("%s", str(fuse_alignment))
+        fuse_card_list_url = str(self.woh.URLS['fuse_eligible_list']) % fuse_alignment
         eligible_fuse_cards = []
         print "Fetching " + fuse_card_list_url + "..."
         index = self.woh.parse_page(fuse_card_list_url)
         if index:
             # TO DO: Need to get the last page better
-            fuse_pages = int(len(index.select(".flickSimple a.a_link")))
+            fuse_pages = int(index.select(".flickSimple a.a_link")[-1].get_text().strip())
             print "Parsing " + str(fuse_pages) + " fuse pages..."
             r_fuse_list_urls = [self.woh.URLS['fuse_eligible_list'] + str(page) for page in range(0, fuse_pages, 10)]
 

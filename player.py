@@ -25,20 +25,26 @@ class Player(object):
         else:
             return False
 
-    def get_card_count(self):
-        html = self.woh.parse_page(self.woh.URLS['mypage'])
-        if html:
-            card_text = html.select(".card a")[0].get_text().strip()
+    def get_card_count(self, alignment=0):
+        url = str(self.woh.URLS['card_list_index']) % (int(alignment), 0)
+
+        html = self.woh.parse_page(url)
+        if html.select(".flickSimple a.a_link"):
+            page_count = int(html.select(".flickSimple a.a_link")[-1].get_text().strip())
+
+            self.woh.parse_page()
+            print card_text
+
             return int(re.match(r"\d+", card_text).group())
         else:
             return 0
 
     def update_roster(self):
         new_roster = []
-        card_list_urls = [self.woh.URLS['card_list_index'] + str(page) for page in range(0, self.get_card_count(), 10)]
-        print "Getting " + str(self.get_card_count()) + " cards..."
+        card_list_urls = [self.woh.URLS['card_list_index'] + str(page) for page in range(0, self.get_card_count(alignment=0), 10)]
+        print "Getting " + str(self.get_card_count(alignment=0)) + " cards..."
         for url in card_list_urls:
-            print "Walking " + url + "..."
+            print "Walking " + url % (0, 0) + "..."
             html = self.woh.parse_page(url)
             if html:
                 #page_cards = html.select("a[href^=" + self.woh.URLS['card_list_desc'] + "]")
@@ -78,11 +84,12 @@ class Player(object):
                         #curr_card =
 
                         #print curr_card.get_unique_id()
-                        print "about to append " + global_properties["name"]
                         curr_card = Card(unique_id, properties)
 
-                        new_roster.append(curr_card)
-                        print str(len(new_roster)) + " 2nd-to-last-card = " + new_roster[len(new_roster)-2].get_name()
+                        if curr_card not in new_roster:
+                            new_roster.append(curr_card)
+                            print "appended " + global_properties["name"]
+                            
 
         #new_roster = list(set(new_roster))
 

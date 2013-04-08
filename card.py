@@ -9,25 +9,10 @@ class CommonEqualityMixin(object):
 
 class Card(CommonEqualityMixin):
     unique_id = None
-    properties = {
-        "global_id": "",
-        "img_id": "",
-        "name": "",
-        "alignment": 1,
-        "rarity": 0,
-        "max_level": 99,
-        "level": 1,
-        "ability_level": 1,
-        "atk_pwr": None,
-        "def_pwr": None,
-        "pwr_req": None,
-        "silver": 0,
-        "xp": 0,
-    }
 
     def __init__(self, unique_id, properties):
         self.unique_id = unique_id
-        self.properties.update(properties)
+        self.properties = properties
 
     def __eq__(self, other):
         return self.get_unique_id() == other.get_unique_id()
