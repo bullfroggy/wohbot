@@ -79,10 +79,10 @@ class Player(object):
 
                         #print curr_card.get_unique_id()
                         print "about to append " + global_properties["name"]
-                        card_to_append = copy.deepcopy(Card(unique_id, properties))
+                        curr_card = Card(unique_id, properties)
 
-                        new_roster.append(card_to_append)
-                        print "2nd-to-last-card = " + new_roster[len(new_roster)-2].get_name()
+                        new_roster.append(curr_card)
+                        print str(len(new_roster)) + " 2nd-to-last-card = " + new_roster[len(new_roster)-2].get_name()
 
         #new_roster = list(set(new_roster))
 
