@@ -165,7 +165,8 @@ class Player(object):
 
     def get_num_randoms(self):
         f = self.get_friend_num()
-        friendRallies = f * 12 * 2
+        friendRallies = (f * 12) + f
         randRallies = 500 - friendRallies
         runRand = (randRallies / 12)
+        print runRand
         return runRand

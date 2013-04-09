@@ -76,7 +76,7 @@ class Bot(object):
     def rally_friends(self):
         f = self.player.get_friend_list()
         for x in f:
-            if self.player.get_rally_points() >= 9995:
+            if self.player.get_rally_points() >= 9993:
                 print "Rally point limit reached"
                 return True
             start = "http://ultimate-a.cygames.jp/ultimate/cheer/index/"
@@ -147,10 +147,10 @@ class Bot(object):
 
     def message_randoms(self):
         f = open('users.txt')
-        r = self.player.get_num_randoms()
+        random_num = self.player.get_num_randoms()
         count = 0
         for x in f:
-            if count <= r:
+            if random_num > count:
                 p = self.player.get_rally_points()
                 print p, "rally points"
                 if p >= 9991:
@@ -173,28 +173,32 @@ class Bot(object):
                         return True
                     if "excessive tapping" in str(rallyURL):
                         print "Too many taps"
-                if "6 Rally Points by sending a message!" in str(rallyURL):
-                    lines = str(rallyURL).splitlines()
-                    mess = ""
-                    for line in lines:
-                        if 'name="message_id"' in line:
-                            mess = line.split('"')[5]
-                        if "ultimate/cheer/comment_check" in line:
-                            p = self.player.get_rally_points()
-                            rand = line.split('"')[1]
-                            cookies = dict(sid=self.player.get_sid())
-                            user_agent = {'User-agent': 'Mozilla/5.0'}
-                            payload = {'message': 'rally!', 'sort': '1', 'to_viewer_id': x, 'bef_friendship_point': p, 'aft_friendship_point': p, 'is_message': '0', 'is_cheer': '0', 'is_error': '0', 'ret_act': '0', 'message_id': mess, 'page': '0', 'offset': '0'}
-                            r = requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
-                            moreLines = r.text.splitlines()
-                            for line in moreLines:
-                                if "ultimate/cheer/send_check" in line:
-                                    rand = line.split("'")[1]
-                                    cookies = dict(sid=self.player.get_sid())
-                                    user_agent = {'User-agent': 'Mozilla/5.0'}
-                                    payload = {'to_viewer_id': x, 'ret_act': '0', 'message_id': "", 'sort': '1', 'page': '0'}
-                                    requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
-                                    print "Sending message"
-                                    count += 1
-            return False
+                if random_num > count:
+                    if "6 Rally Points by sending a message!" in str(rallyURL):
+                        lines = str(rallyURL).splitlines()
+                        mess = ""
+                        for line in lines:
+                            if 'name="message_id"' in line:
+                                mess = line.split('"')[5]
+                            if "ultimate/cheer/comment_check" in line:
+                                p = self.player.get_rally_points()
+                                rand = line.split('"')[1]
+                                cookies = dict(sid=self.player.get_sid())
+                                user_agent = {'User-agent': 'Mozilla/5.0'}
+                                payload = {'message': 'rally!', 'sort': '1', 'to_viewer_id': x, 'bef_friendship_point': p, 'aft_friendship_point': p, 'is_message': '0', 'is_cheer': '0', 'is_error': '0', 'ret_act': '0', 'message_id': mess, 'page': '0', 'offset': '0'}
+                                r = requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+                                moreLines = r.text.splitlines()
+                                for line in moreLines:
+                                    if "ultimate/cheer/send_check" in line:
+                                        rand = line.split("'")[1]
+                                        cookies = dict(sid=self.player.get_sid())
+                                        user_agent = {'User-agent': 'Mozilla/5.0'}
+                                        payload = {'to_viewer_id': x, 'ret_act': '0', 'message_id': "", 'sort': '1', 'page': '0'}
+                                        requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+                                        print "Sending message"
+                                        count += 1
+                else:
+                    break
+            else:
+                break
         return True
