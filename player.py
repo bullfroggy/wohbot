@@ -26,45 +26,67 @@ class Player(object):
             return False
 
     def get_card_count(self, alignment=0):
-        url = str(self.woh.URLS['card_list_index']) % (int(alignment), 0)
-
-        html = self.woh.parse_page(url)
-        if html.select(".flickSimple a.a_link"):
-            page_count = int(html.select(".flickSimple a.a_link")[-1].get_text().strip())
-
-            self.woh.parse_page()
-            print card_text
-
+        html = self.woh.parse_page(self.woh.URLS['mypage'])
+        if html:
+            card_text = html.select(".card a")[0].get_text().strip()
             return int(re.match(r"\d+", card_text).group())
         else:
             return 0
+        """
+        # Trying to make an alignment-specific card_count
+        url = str(self.woh.URLS['card_list_index']) % (int(alignment), 0)
+        print "get_card_count " + url
+        html = self.woh.parse_page(url)
+        if html.select(".flickSimple a.a_link"):
+            last_page_url = html.select(".flickSimple a.a_link")[-1].get("href")
+            last_page_marker = re.search(r"index\/\d+\/\d+\/\d+\/(\d+)", last_page_url)
+            if last_page_marker:
+                card_count = int(last_page_marker.group(1))
+            else:
+                card_count = 0
+            print card_count
+            
+            max_card_url = str(self.woh.URLS['card_list_index']) % (int(alignment), card_count)
+            print max_card_url
+            card_html = self.woh.parse_page(max_card_url)
+            
+            last_page_card_count = card_html.select("a[href^=\'/desc/\'] img")
+            print len(last_page_card_count)
+            if last_page_card_count:
+                card_count += len(last_page_card_count)
+
+            print card_count
+
+            return card_count
+        else:
+            return 0
+        """
 
     def update_roster(self):
         new_roster = []
         card_list_urls = [self.woh.URLS['card_list_index'] + str(page) for page in range(0, self.get_card_count(alignment=0), 10)]
         print "Getting " + str(self.get_card_count(alignment=0)) + " cards..."
         for url in card_list_urls:
-            print "Walking " + url % (0, 0) + "..."
-            html = self.woh.parse_page(url)
+            print url % (0,0)
+            # Walk through each page of cards in roster
+            html = self.woh.parse_page(url % (0, 0))
             if html:
-                #page_cards = html.select("a[href^=" + self.woh.URLS['card_list_desc'] + "]")
                 page_cards = html.select("a[href^=" + self.woh.URLS['card_list_desc'] + "] img")
-                #page_cards = html.select(".member_bg>div+table~table")
-
+                
                 for card in page_cards:
-                    level = ""
 
+                    level = ""
                     image_id = re.search(r"\/card\/\w+\/([a-f0-9]+)\.jpg", card.get("src").strip()).group(1)
                     unique_id = re.search(r"desc/(\d+)", card.find_parent("a").get("href")).group(1)
+
                     if image_id and unique_id:
-                        #print "Identifying " + unique_id + " with " + image_id
 
                         global_properties = self.woh.parse_card_json(image_id)
-                        # print global_properties
 
                         middle_element = card.find_parent("table")
-                        #print(middle_element.encode('utf-8'))
+
                         lvl_element = middle_element.find(name="span", text=re.compile(r"Lv:"))
+
                         if lvl_element:
                             level_data = lvl_element.find_next_sibling(text=re.compile(r"(\d+)\/\d+"))
 
@@ -80,21 +102,12 @@ class Player(object):
 
                         }
 
-                        #print str(properties).encode('utf-8')
-                        #curr_card =
-
-                        #print curr_card.get_unique_id()
                         curr_card = Card(unique_id, properties)
 
                         if curr_card not in new_roster:
                             new_roster.append(curr_card)
-                            print "appended " + global_properties["name"]
-                            
 
-        #new_roster = list(set(new_roster))
-
-        for each_card in new_roster:
-            print each_card.get_name()
+        self.roster = new_roster
 
         return
 
@@ -106,10 +119,16 @@ class Player(object):
 
         return
 
-    def get_all_cards(self):
-        card_urls = ["http://ultimate-a.cygames.jp/ultimate/archive/view_other/00000001/"+str(page)+"/0/1/0/0/0" for page in range(0, self.get_card_count(), 10)]
+    def get_roster(self, rarity=-1, alignment=0, level=0):
+        filtered_roster = []
 
-        return
+        for c in self.roster:
+            if ((c.get_rarity() == rarity or rarity == -1) and
+                (c.get_alignment() == alignment or alignment == 0) and
+                (c.get_level() == level or level == 0)):
+                filtered_roster.append(c)
+
+        return filtered_roster
 
     def get_sid(self):
         return self.settings["sid"]
@@ -120,6 +139,16 @@ class Player(object):
     def get_farm_mission(self):
         return self.farm_mission
 
+    def get_card(self, unique_id):
+        for c in self.roster:
+            if c.get_unique_id() == unique_id:
+                print "i found UID " + unique_id
+                break
+        else:
+            c = None
+
+        return c
+        
     def get_card_space_remaining(self):
         html = self.woh.parse_page(self.woh.URLS['mypage'])
         if html:

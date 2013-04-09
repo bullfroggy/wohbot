@@ -101,13 +101,17 @@ class Card(CommonEqualityMixin):
     def fuse(self, fuser_card):
         r_set_base = self.woh.parse_page(self.woh.URLS['fuse_base_set'] + self.get_unique_id())
         if r_set_base:
+            print "Base fuse set to " + self.get_unique_id()
             #read page HTML to ensure base card is what we expect
             #success!
             r_fuse_card = self.woh.parse_page(self.woh.URLS['fuse_card_set'] + fuser_card, payload=dict({'sleeve_str': fuser_card}))
             if r_fuse_card:
+                print "Fused base card %s to fuser %s" % (self.get_unique_id(), fuser_card)
                 #read page HTML to get success message
                 #double success!
+                # if success, remove fuser card from roster
                 pass
+        return self
 
 
 

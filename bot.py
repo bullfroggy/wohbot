@@ -1,3 +1,4 @@
+import re
 from woh import WoH
 
 
@@ -31,15 +32,21 @@ class Bot(object):
 
         # fuse_alignment correlates to database alignments. 0 is any, 1 is speed, 2 is bruiser, 3 is tactics
     def smart_fuse(self, fuse_rarity=1, fuse_alignment=0, max_fuse_level=0):
-        fuse_card_list_url = str(self.woh.URLS['fuse_eligible_list']) % fuse_alignment
+        self.player.update_roster()
+
+        p_roster = self.player.get_roster()
+        print len(p_roster)
+
+        fuse_card_list_url = str(self.woh.URLS['fuse_eligible_list']) % (fuse_alignment, 0)
         eligible_fuse_cards = []
-        print "Fetching " + fuse_card_list_url + "..."
+
+        #print "Fetching " + fuse_card_list_url + "..."
         index = self.woh.parse_page(fuse_card_list_url)
         if index:
             # TO DO: Need to get the last page better
-            fuse_pages = int(index.select(".flickSimple a.a_link")[-1].get_text().strip())
-            print "Parsing " + str(fuse_pages) + " fuse pages..."
-            r_fuse_list_urls = [self.woh.URLS['fuse_eligible_list'] + str(page) for page in range(0, fuse_pages, 10)]
+            fuse_pages = int(re.search(r"union_card\/\d+\/\d+\/\d+\/(\d+)", index.select(".flickSimple a.a_link")[-1].get("href").strip()).group(1))
+            print "Parsing %d fuse pages..." % fuse_pages
+            r_fuse_list_urls = [str(self.woh.URLS['fuse_eligible_list']) % (0, page) for page in range(0, fuse_pages+1, 10)]
 
             for url in r_fuse_list_urls:
                 print "Walking " + url + "..."
@@ -48,39 +55,23 @@ class Bot(object):
                     page_cards = html.select("a[href^=" + self.woh.URLS['fuse_base_set'] + "]")
 
                     for card in page_cards:
-                        unique_id = re.search(r"desc/(\d+)", card.get("href")).group(1)
-                        if unique_id:
-                            middle_element = card.find_parent("table")
-                            top_element = middle_element.find_previous_sibling("div")
-                            #print top_element
-                            rarity = re.search(r"\((\w+)\)", top_element.find("p")).group(1).strip()
-                            print "Rarity: " + rarity
-                            alignment = re.search(r"(\W+)", str(top_element.find("span"))).group(1).strip()
+                        unique_id = re.search(r"union_change/(\d+)", card.get("href")).group(1)
+                        curr_card = self.player.get_card(unique_id)
+                        
+                        if (curr_card not in eligible_fuse_cards and
+                            (fuse_rarity == 0 or curr_card.get_rarity() == fuse_rarity) and
+                            (fuse_alignment == 0 or curr_card.get_alignment() == fuse_alignment) and
+                            (max_fuse_level == 0 or curr_card.get_level() <= max_fuse_level)):
+                            eligible_fuse_cards.append(curr_card)
+        fused_cards = []
 
-                            properties = {
-                                "rarity": rarity,
-                                "alignment": alignment,
+        for c in eligible_fuse_cards:
+            #if c.get_global_id() 
+            print "I'd fuse this card: " + c.get_name()
+            #fuse_cards.append(c.fuse())
 
-                            }
-                            #curr_card =
 
-                            #print curr_card.get_unique_id()
-
-                            eligible_fuse_cards.append(Card(unique_id, properties))
-
-        eligible_fuse_cards = list(set(eligible_fuse_cards))
-
-        for each_card in eligible_fuse_cards:
-            print each_card.get_alignment()
-
-            if fuse_base.get_rarity() == fuse_rarity:
-                if fuse_alignment == 0 or fuse_base.get_alignment() == fuse_alignment:
-                    r_fuse_base = self.woh.parse_page(self.woh.URLS["fuse_base_set"] + fuse_base.get_unique_id())
-                    if r_fuse_base:
-                        # read HTML to confirm base is right
-                        pass
-
-        self.player.update_roster()
+        #self.player.update_roster()
 
         return
 
