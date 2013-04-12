@@ -23,7 +23,8 @@ def main():
         "player": player,
     }
     bot = Bot(bot_settings)
-    bot.smart_fuse()
+    fused_cards = bot.smart_fuse()
+    bot.smart_boost()
     print "Done!"
 
 if __name__ == '__main__':

@@ -1,3 +1,5 @@
+from woh import WoH
+
 class CommonEqualityMixin(object):
 
     def __eq__(self, other):
@@ -10,7 +12,9 @@ class CommonEqualityMixin(object):
 class Card(CommonEqualityMixin):
     unique_id = None
 
-    def __init__(self, unique_id, properties):
+    def __init__(self, player, unique_id, properties):
+        self.player = player
+        self.woh = WoH(player)
         self.unique_id = unique_id
         self.properties = properties
 
@@ -98,13 +102,25 @@ class Card(CommonEqualityMixin):
     def get_silver(self):
         return self.properties["silver"]
 
+    def get_version(self):
+        return int(str(self.properties["global_id"])[-1])
+
     def fuse(self, fuser_card):
-        r_set_base = self.woh.parse_page(self.woh.URLS['fuse_base_set'] + self.get_unique_id())
+        if isinstance(fuser_card, Card):
+            fuser_id = fuser_card.get_unique_id()
+        else:
+            fuser_id = str(fuser_card)
+
+        r_set_base_url = self.woh.URLS['fuse_base_set'] + self.get_unique_id()
+        print r_set_base_url
+        r_set_base = self.woh.parse_page(r_set_base_url)
         if r_set_base:
             print "Base fuse set to " + self.get_unique_id()
             #read page HTML to ensure base card is what we expect
             #success!
-            r_fuse_card = self.woh.parse_page(self.woh.URLS['fuse_card_set'] + fuser_card, payload=dict({'sleeve_str': fuser_card}))
+            r_fuse_card_url = self.woh.URLS['fuse_card_set'] + fuser_id
+            print r_fuse_card_url
+            r_fuse_card = self.woh.parse_page(r_fuse_card_url, payload=dict({'sleeve_str': fuser_id}))
             if r_fuse_card:
                 print "Fused base card %s to fuser %s" % (self.get_unique_id(), fuser_card)
                 #read page HTML to get success message
@@ -112,6 +128,29 @@ class Card(CommonEqualityMixin):
                 # if success, remove fuser card from roster
                 pass
         return self
+
+    def boost(self, boosters):
+        if len(boosters) > 0:
+            r_set_base_url = self.woh.URLS['boost_base_set'] + self.get_unique_id()
+            print r_set_base_url
+            r_set_base = self.woh.parse_page(r_set_base_url)
+            if r_set_base:
+                # TODO: read the HTML to confirm base is right
+                unique_id_url_str = "_".join(map(str, boosters))
+                r_boost_url = self.woh.URLS['boost_card_set'] + unique_id_url_str
+                print r_boost_url
+
+                r_boost_confirm = self.woh.parse_page(r_boost_url)
+                if r_boost_confirm.select(".leaderbg span"):
+                    new_level = int(re.search("Lv: (\d+)", r_boost_confirm.select(".leaderbg span").find("Lv:").get_text().strip()))
+                    # TODO: read HTML to confirm boost occurred
+                    # Update self level in roster
+                    self.set_level(new_level)
+                    pass
+                    #success!
+
+        return self
+
 
 
 

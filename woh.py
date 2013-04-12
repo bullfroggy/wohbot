@@ -13,6 +13,8 @@ class WoH(object):
         "fuse_eligible_list": "http://ultimate-a.cygames.jp/ultimate/card_union/union_card/%d/1/0/%d",
         "fuse_base_set": "http://ultimate-a.cygames.jp/ultimate/card_union/union_change/",
         "fuse_card_set": "http://ultimate-a.cygames.jp/ultimate/card_union/synthesis/",
+        "boost_base_set": "http://ultimate-a.cygames.jp/ultimate/card_str/base_change/",
+        "boost_card_set": "http://ultimate-a.cygames.jp/ultimate/card_str/strengthen/",
         "card_api": "http://rpgotg.herokuapp.com/api/v1/cards/",
     }
 
