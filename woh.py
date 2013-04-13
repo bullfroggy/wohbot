@@ -8,10 +8,15 @@ class WoH(object):
         "fusion": "http://ultimate-a.cygames.jp/ultimate/card_union",
         "mission_23": "http://ultimate-a.cygames.jp/ultimate/quest/play/2/3",
         "mission_24": "http://ultimate-a.cygames.jp/ultimate/quest/play/2/4",
-        "card_list_index": "http://ultimate-a.cygames.jp/ultimate/card_list/index/0/1/0/",
+        "card_list_index": "http://ultimate-a.cygames.jp/ultimate/card_list/index/%d/1/0/%d",
         "card_list_desc": "http://ultimate-a.cygames.jp/ultimate/card_list/desc/",
+        "fuse_eligible_list": "http://ultimate-a.cygames.jp/ultimate/card_union/union_card/%d/1/0/%d",
         "fuse_base_set": "http://ultimate-a.cygames.jp/ultimate/card_union/union_change/",
-        "fuse_card_set": "http://ultimate-a.cygames.jp/ultimate/card_union/synthesis/",
+        "fuse_card_set": "http://ultimate-a.cygames.jp/ultimate/card_union/synthesis/%s?sleeve_str=%s",
+        "boost_base_set": "http://ultimate-a.cygames.jp/ultimate/card_str/base_change/",
+        "boost_card_set": "http://ultimate-a.cygames.jp/ultimate/card_str/strengthen/",
+        "boost_result": "http://ultimate-a.cygames.jp/ultimate/card_str/index/-1/0",
+        "card_api": "http://rpgotg.herokuapp.com/api/v1/cards/",
     }
 
     def __init__(self, player):
@@ -24,13 +29,25 @@ class WoH(object):
             return False
 
     def parse_page(self, url, req="get", payload=dict("")):
-        cookies = dict(sid=self.get_sid())
-        if req=="get":
-            r = requests.get(url, cookies=cookies, data=payload)
-        elif req=="post":
-            r = requests.post(url, cookies=cookies, data=payload)
 
-        if r.status_code == 200:
-            return BeautifulSoup(r.text)
-        else:
-            return False
+        cookies = dict(sid=self.player.get_sid())
+        user_agent = {"User-Agent": "Mozilla/5.0 (Linux; Android 4.1.1; Nexus 7 Build/JRO03D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Safari/535.19"}
+
+        if req=="get":
+            r = requests.get(url, headers=user_agent, cookies=cookies, data=payload)
+        elif req=="post":
+            r = requests.post(url, headers=user_agent, cookies=cookies, data=payload)
+
+        r.raise_for_status()
+        return BeautifulSoup(r.text)
+
+    def parse_json(self, url, req="get", payload=dict("")):
+        if req=="get":
+            r = requests.get(url, data=payload)
+        elif req=="post":
+            r = requests.post(url, data=payload)
+        r.raise_for_status()
+        return r.json()
+
+    def parse_card_json(self, card_id):
+        return self.parse_json(self.get_url("card_api") + card_id)
