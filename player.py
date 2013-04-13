@@ -67,17 +67,16 @@ class Player(object):
         fuse_card_list_url = str(self.woh.URLS['fuse_eligible_list']) % (0, 0)
         eligible_fuse_cards = []
 
-        print "Fetching " + fuse_card_list_url + "..."
         index = self.woh.parse_page(fuse_card_list_url)
         if index:
             if not index.select(".flickSimple a.a_link"):
                 # There is just one page of cards
-                fuse_pages = 1
+                fuse_pages = 10
             else:
                 # TO DO: Need to get the last page better
                 fuse_pages = int(re.search(r"union_card\/\d+\/\d+\/\d+\/(\d+)", index.select(".flickSimple a.a_link")[-1].get("href").strip()).group(1))
 
-            print "Parsing %d fuse pages..." % fuse_pages
+            print "Getting fusables (up to marker %d)..." % fuse_pages
             r_fuse_list_urls = [str(self.woh.URLS['fuse_eligible_list']) % (0, page) for page in range(0, fuse_pages+1, 10)]
 
             for url in r_fuse_list_urls:
@@ -108,12 +107,13 @@ class Player(object):
 
 
                                 properties = {
+                                    "global_id": global_properties["global_id"],
+                                    "img_id": image_id,
+                                    "name": global_properties["name"],
                                     "rarity": global_properties["rarity"],
                                     "alignment": global_properties["alignment"],
-                                    "img_id": image_id,
+                                    "pwr_req": global_properties["power_required"],
                                     "level": level,
-                                    "global_id": global_properties["global_id"],
-                                    "name": global_properties["name"],
 
                                 }
                                 #print "found " + unique_id
@@ -132,9 +132,9 @@ class Player(object):
     def update_roster(self):
         new_roster = []
         card_list_urls = [self.woh.URLS['card_list_index'] + str(page) for page in range(0, self.get_card_count(alignment=0), 10)]
-        print "Getting " + str(self.get_card_count(alignment=0)) + " cards..."
+        print "Updating roster (" + str(self.get_card_count(alignment=0)) + " cards)"
         for url in card_list_urls:
-            print url % (0,0)
+            #print url % (0,0)
             # Walk through each page of cards in roster
             html = self.woh.parse_page(url % (0, 0))
             if html:
@@ -160,12 +160,13 @@ class Player(object):
                             level =  int(re.search(r"(\d+)\/\d+", level_data.strip()).group(1))
 
                         properties = {
+                            "global_id": global_properties["global_id"],
+                            "img_id": image_id,
+                            "name": global_properties["name"],
                             "rarity": global_properties["rarity"],
                             "alignment": global_properties["alignment"],
-                            "img_id": image_id,
+                            "pwr_req": global_properties["power_required"],
                             "level": level,
-                            "global_id": global_properties["global_id"],
-                            "name": global_properties["name"],
 
                         }
 
@@ -186,13 +187,14 @@ class Player(object):
 
         return
 
-    def get_roster(self, rarity=-1, alignment=0, level=0, max_level=0, max_pwr_req=998, version=-1):
+    def get_roster(self, rarity=-1, alignment=0, level=0, max_level=0, max_pwr_req=0, version=-1):
         filtered_roster = []
 
         for c in self.roster:
             if (rarity == -1 or c.get_rarity() == rarity and
                 (alignment == 0 or c.get_alignment() == alignment) and
                 (max_level==0 or c.get_level() <= max_level) and
+                (max_pwr_req==0 or c.get_pwr_req() <= max_pwr_req) and
                 (level == 0 or c.get_level() == level) and
                 (version == -1 or c.get_version() == version)):
                 filtered_roster.append(c)

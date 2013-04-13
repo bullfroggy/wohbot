@@ -59,53 +59,52 @@ class Bot(object):
 
         return fused_cards
 
-    def smart_boost(self, base_rarity=2, base_version=-1, base_alignment=0, base_max_level=10, boost_rarity=0, boost_count=10, boost_alignment=0, boost_version=0, boost_max_level=1, boost_max_pwr_req=11):
+    def smart_boost(self, base_rarity=2, base_version=-1, base_alignment=0, base_max_level=10, base_max_pwr_req=20, boost_rarity=0, boost_count=1, boost_alignment=0, boost_version=0, boost_max_level=1, boost_max_pwr_req=11):
         boosted_cards = []
         spent_ids = []
 
         # Get all requested cards
         self.player.update_roster()
-        base_cards = self.player.get_roster(rarity=base_rarity, version=base_version, alignment=base_alignment, max_level=base_max_level)
+        base_cards = self.player.get_roster(rarity=base_rarity, version=base_version, alignment=base_alignment, max_level=base_max_level, max_pwr_req=base_max_pwr_req)
         boost_cards = self.player.get_roster(rarity=boost_rarity, alignment=boost_alignment, version=boost_version, max_level=boost_max_level, max_pwr_req=boost_max_pwr_req)
 
         # Sort base cards by fused/unfused
-        base_cards.sort(key=lambda c: c.get_version, reverse=True)
+        base_cards.sort(key=lambda c: c.get_base_rarity, reverse=True)
 
         # Iterate through each base card
-        for base_card in base_cards:
+        for curr_card in base_cards:
             card_boosted = False
+            base_card = curr_card
 
             if len(boost_cards) >= 1:
                 if base_card.get_unique_id() not in spent_ids:
-                    print "Working on " + base_card.get_name() + "/lv" + str(base_card.get_level())
+                    print "Working on " + base_card.get_name() + "/lvl " + str(base_card.get_level())
 
-                    # Get set of matching boost cards
-                    boost_set = boost_cards[:boost_count]
-                    boost_ids = [bcard.get_unique_id() for bcard in boost_set]
+                    while len(boost_cards) > 0 and base_card.get_level() <= base_max_level:
+                        # Get set of matching boost cards
+                        boost_set = boost_cards[:boost_count]
+                        boost_ids = [bcard.get_unique_id() for bcard in boost_set]
 
-                    print "Found " + str(len(boost_ids)) + "qualifying boosters"
-                    for booster in boost_ids:
-                        print "Boosting with " + booster
-                        if base_card.get_level() <= base_max_level:
-                            print "Base card eligible for boost"
-                            result = base_card.boost(booster)
+                        print "Found " + str(len(boost_ids)) + " qualifying boosters"
+                        print base_card.get_name() + " eligible for boost at lvl " + str(base_card.get_level())
+                        result = base_card.boost(boost_ids)
 
-                            if result.get_unique_id() == base_card.get_unique_id():
-                                print "Card boosted"
-                                base_card = result
-                                card_boosted = True
+                        if result.get_unique_id() == base_card.get_unique_id():
+                            print result.get_name() + " boosted to lvl " + str(result.get_level())
+                            base_card = result
+                            card_boosted = True
 
-                                # Mark used cards as spent
-                                [spent_ids.append(uid) for uid in boost_ids]
+                            # Mark used cards as spent
+                            [spent_ids.append(uid) for uid in boost_ids]
 
-                                # Remove used set of boost cards from list
-                                boost_cards = boost_cards[boost_count:]
-                        elif card_boosted:
-                                print "Base card ineligible for boosting"
-                                boosted_cards.append(result)
+                            # Remove used set of boost cards from list
+                            boost_cards = boost_cards[boost_count:]
+
+                    if card_boosted:
+                        boosted_cards.append(result)
             else:
                 print "No more qualifying boosters"
-
+                break
 
         return boosted_cards
 
