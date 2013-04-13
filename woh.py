@@ -18,6 +18,30 @@ class WoH(object):
         "boost_result": "http://ultimate-a.cygames.jp/ultimate/card_str/index/-1/0",
         "card_api": "http://rpgotg.herokuapp.com/api/v1/cards/",
     }
+    OPERATION_ENERGY_COST = {
+        1: 1,
+        2: 1,
+        3: 2,
+        4: 3,
+        5: 4,
+        6: 5,
+        7: 6,
+        8: 7,
+        9: 8,
+        10: 9,
+        11: 10,
+        12: 11,
+        13: 12,
+        14: 10,
+        15: 11,
+        16: 12,
+        17: 13,
+        18: 10,
+        19: 11,
+        20: 12,
+        21: 13,
+    }
+
 
     def __init__(self, player):
         self.player = player
@@ -51,3 +75,4 @@ class WoH(object):
 
     def parse_card_json(self, card_id):
         return self.parse_json(self.get_url("card_api") + card_id)
+

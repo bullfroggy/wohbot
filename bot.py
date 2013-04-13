@@ -52,7 +52,11 @@ class Bot(object):
         for x in range(0, required_battles):
             self.farm_mission(self.woh.get_mission_url(operation, mission))
 
+
+    """
+    This function fuses a filtered series of base_cards with a matching fuser_card.
     # fuse_alignment correlates to database alignments. 0 is any, 1 is speed, 2 is bruiser, 3 is tactics
+    """
     def smart_fuse(self, fuse_rarity=1, fuse_alignment=0, max_fuse_level=0):
         fused_cards = []
         spent_ids = []
@@ -81,6 +85,9 @@ class Bot(object):
 
         return fused_cards
 
+    """
+    This function boosts a filtered series of base_cards against a filtered series of eligible fuse_cards.
+    """
     def smart_boost(self, base_rarity=2, base_version=-1, base_alignment=0, base_max_level=10, base_max_pwr_req=20, boost_rarity=0, boost_count=1, boost_alignment=0, boost_version=0, boost_max_level=1, boost_max_pwr_req=11):
         boosted_cards = []
         spent_ids = []
@@ -129,4 +136,3 @@ class Bot(object):
                 break
 
         return boosted_cards
-

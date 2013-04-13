@@ -188,7 +188,3 @@ class Card(CommonEqualityMixin):
                         #success!
         #raw_input("Press Enter to continue...")
         return self
-
-
-
-
