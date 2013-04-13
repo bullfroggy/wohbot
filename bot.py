@@ -26,9 +26,31 @@ class Bot(object):
 
         return True
 
-    def max_farm(self):
+    def farm_mission(self, mission_url):
+        self.woh.parse_page(mission_url)
+        return True
+
+    def farm_newest_mission(self):
+        operation, mission = self.player.get_newest_mission()
+        # Only Farm the Mission if you have enough energy for at least one attack
+        if mission != "boss":
+            if self.player.get_remaining_energy() >= self.woh.OPERATION_ENERGY_COST[operation]:
+                self.farm_mission(self.woh.get_mission_url(operation, mission))
+                return True
+            else:
+                return False
+        else:
+            self.farm_mission(self.woh.get_mission_url(operation, mission))
+            return True
+
+    def max_farm_newest_mission(self):
+        while self.farm_newest_mission():
+            print "Farmed"
+
+    def max_farm(self, operation, mission):
         required_battles = int(self.player.get_remaining_energy() / 3)
-        self.farm(required_battles)
+        for x in range(0, required_battles):
+            self.farm_mission(self.woh.get_mission_url(operation, mission))
 
     # fuse_alignment correlates to database alignments. 0 is any, 1 is speed, 2 is bruiser, 3 is tactics
     def smart_fuse(self, fuse_rarity=1, fuse_alignment=0, max_fuse_level=0):
