@@ -1,4 +1,4 @@
-import re
+import re, operator
 from woh import WoH
 
 
@@ -75,7 +75,12 @@ class Bot(object):
         boost_cards = self.player.get_roster(rarity=boost_rarity, alignment=boost_alignment, version=boost_version, max_level=boost_max_level, max_pwr_req=boost_max_pwr_req)
 
         # Sort base cards by fused/unfused
-        base_cards.sort(key=lambda c: c.get_base_rarity, reverse=True)
+        base_cards.sort(key=lambda c: (c.get_base_rarity(), -c.get_version(), -c.get_level()))
+        print "Sorted list..."
+        print "..."
+        print "Base Cards after sort..."
+        for c in base_cards:
+            print "r=%d (br=%d + v=%d) @ lvl=%d (%s)" % (c.get_rarity(), c.get_base_rarity(), c.get_version(), c.get_level(), c.get_name())
 
         # Iterate through each base card
         for curr_card in base_cards:
