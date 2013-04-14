@@ -19,7 +19,7 @@ class Bot(object):
 
         if mission == "boss":
             self.woh.parse_page(self.woh.get_mission_url(operation, mission))
-            print "Farmed Boss at %d-%d" % (operation, mission)
+            print "Farmed Boss at %d-%s" % (operation, mission)
             return True
         else:
             if self.player.get_remaining_energy() >= self.woh.OPERATION_ENERGY_COST[operation]:
