@@ -19,8 +19,6 @@ def max_farm(bot, operation=0, mission=0):
     has_energy = True
     while has_energy:
         has_energy = bot.farm_mission(operation, mission)
-        print "Farmed Mission %d-%d" % (operation, mission)
-
 
 def main():
     p = optparse.OptionParser()

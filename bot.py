@@ -17,15 +17,17 @@ class Bot(object):
         if operation == 0 or mission == 0:
             operation, mission = self.player.get_newest_mission()
 
-        if mission != "boss":
+        if mission == "boss":
+            self.woh.parse_page(self.woh.get_mission_url(operation, mission))
+            print "Farmed Boss at %d-%d" % (operation, mission)
+            return True
+        else:
             if self.player.get_remaining_energy() >= self.woh.OPERATION_ENERGY_COST[operation]:
                 self.woh.parse_page(self.woh.get_mission_url(operation, mission))
+                print "Farmed Mission %d-%d" % (operation, mission)
                 return True
             else:
                 return False
-        else:
-            self.woh.parse_page(self.woh.get_mission_url(operation, mission))
-            return True
 
 
     """
