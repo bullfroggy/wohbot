@@ -6,6 +6,7 @@ class WoH(object):
     URLS = {
         "mypage": "http://ultimate-a.cygames.jp/ultimate/mypage/index",
         "fusion": "http://ultimate-a.cygames.jp/ultimate/card_union",
+        "quest_index": "http://ultimate-a.cygames.jp/ultimate/quest",
         "mission_23": "http://ultimate-a.cygames.jp/ultimate/quest/play/2/3",
         "mission_24": "http://ultimate-a.cygames.jp/ultimate/quest/play/2/4",
         "card_list_index": "http://ultimate-a.cygames.jp/ultimate/card_list/index/%d/1/0/%d",
