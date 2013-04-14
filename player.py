@@ -216,6 +216,19 @@ class Player(object):
     def get_sid(self):
         return self.settings["sid"]
 
+    def get_newest_mission(self):
+        html = self.woh.parse_page(self.woh.URLS['mypage'])
+        newest_mission_link = html.select("#newestMission a")[0].get('href')
+        if "boss" in newest_mission_link:
+            html = self.woh.parse_page(self.woh.URLS['quest_index'])
+            operation_text = html.select(".window3")[0].get_text()
+            operation = int(re.search(r"Operation\s(\d+):", operation_text).group(1))
+            mission = "boss"
+        else:
+            operation = int(re.search(r"(\d+)/(\d+)", newest_mission_link).group(1))
+            mission = int(re.search(r"(\d+)/(\d+)", newest_mission_link).group(2))
+        return operation, mission
+
     def set_farm_mission(self, farm_mission):
         self.farm_mission = farm_mission
 

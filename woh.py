@@ -52,6 +52,15 @@ class WoH(object):
         else:
             return False
 
+    def get_mission_url(self, operation, mission):
+        if mission == "boss":
+            self.parse_page("http://ultimate-a.cygames.jp/ultimate/quest_boss/appear/%d" % operation, req="post")
+            self.parse_page("http://ultimate-a.cygames.jp/ultimate/smart_phone_flash/quest_boss/%d" % operation, req="post")
+            self.parse_page("http://ultimate-a.cygames.jp/ultimate/quest_boss/boss_play_swf/%d" % operation)
+            return "http://ultimate-a.cygames.jp/ultimate/quest_boss/result/%d/1/0" % operation
+        else:
+            return "http://ultimate-a.cygames.jp/ultimate/quest/play/%d/%d" % (operation, mission)
+
     def parse_page(self, url, req="get", payload=dict("")):
 
         cookies = dict(sid=self.player.get_sid())
