@@ -1,5 +1,6 @@
 import re, copy
 from card import Card
+from present import Present
 from woh import WoH
 
 class Player(object):
@@ -16,7 +17,6 @@ class Player(object):
         self.roster = [] # populate via update_roster()
         self.fusables = [] # populate via update_fusables()
         self.presents = []
-        self.device_presents = []
         self.pending_trades = []
         self.woh = WoH(self)
 
@@ -141,8 +141,15 @@ class Player(object):
                 page_cards = html.select("a[href^=" + self.woh.URLS['card_list_desc'] + "] img")
                 
                 for card in page_cards:
-
                     level = ""
+                    curr_atk = ""
+                    curr_def = ""
+                    mastery = ""
+                    lvl_element = None
+                    atk_element = None
+                    def_element = None 
+                    mastery_element = None
+
                     image_id = re.search(r"\/card\/\w+\/([a-f0-9]+)\.jpg", card.get("src").strip()).group(1)
                     unique_id = re.search(r"desc/(\d+)", card.find_parent("a").get("href")).group(1)
 
@@ -153,22 +160,42 @@ class Player(object):
                         middle_element = card.find_parent("table")
 
                         lvl_element = middle_element.find(name="span", text=re.compile(r"Lv:"))
-
                         if lvl_element:
                             level_data = lvl_element.find_next_sibling(text=re.compile(r"(\d+)\/\d+"))
-
                             level =  int(re.search(r"(\d+)\/\d+", level_data.strip()).group(1))
 
+                        atk_element = middle_element.find(name="span", text=re.compile(r"ATK:"))
+                        if atk_element:
+                            atk_data = atk_element.find_next_sibling(text=re.compile(r"(\d+)"))
+                            curr_atk =  int(re.search(r"(\d+)", atk_data.strip()).group(1))
+
+                        def_element = middle_element.find(name="span", text=re.compile(r"DEF:"))
+                        if def_element:
+                            def_data = def_element.find_next_sibling(text=re.compile(r"(\d+)"))
+                            curr_def =  int(re.search(r"(\d+)", def_data.strip()).group(1))
+
+                        mastery_element = middle_element.find(name="span", text=re.compile(r"Mastery:"))
+                        if mastery_element:
+                            mastery_data = mastery_element.find_next_sibling(text=re.compile(r"(\d+)\/\d+"))
+                            mastery =  int(re.search(r"(\d+)\/\d+", mastery_data.strip()).group(1))
+
+                        # TODO: Ability Level
+
                         properties = {
+                            "name": global_properties["name"],
                             "global_id": global_properties["global_id"],
                             "img_id": image_id,
-                            "name": global_properties["name"],
                             "rarity": global_properties["rarity"],
                             "alignment": global_properties["alignment"],
                             "pwr_req": global_properties["power_required"],
                             "level": level,
+                            "atk": curr_atk,
+                            "def": curr_def,
+                            "mastery": mastery,
 
                         }
+
+                        #print repr(properties)
 
                         curr_card = Card(self, unique_id, properties)
 
@@ -179,11 +206,58 @@ class Player(object):
 
         return
 
+    def update_presents(self):
+        new_presents = []
+
+        page_urls = [self.woh.URLS["present_list"],]
+
+        html = self.woh.parse_page(page_urls.pop(0))
+        page_markers = html.select(".flickSimple .a_link")
+        if len(page_markers) > 1:
+            for a in page_markers:
+                page_urls.append(a.get('href').strip())
+
+        for u in page_urls:
+            print repr(u)
+
+        while len(page_urls) > 0:
+            quantity_elements = html.select(".green")
+            for q in quantity_elements:
+                print repr(q)
+            if len(page_urls) > 0:
+                html = self.woh.parse_page(page_urls.pop(0))
+        """
+        http://ultimate-a.cygames.jp/ultimate/image_sp/en/ui/ui_img_money_s.jpg
+        
+        present_list_url = [self.woh.URLS['card_list_index'] + str(page) for page in range(0, self.get_card_count(alignment=0), 10)]
+        print "Updating roster (" + str(self.get_card_count(alignment=0)) + " cards)"
+        for url in card_list_urls:
+            #print url % (0,0)
+            # Walk through each page of cards in roster
+            html = self.woh.parse_page(url % (0, 0))
+            if html:
+                page_cards = html.select("a[href^=" + self.woh.URLS['card_list_desc'] + "] img")
+                
+                for card in page_cards:
+
+                    level = ""
+                    image_id = re.search(r"\/card\/\w+\/([a-f0-9]+)\.jpg", card.get("src").strip()).group(1)
+                    unique_id = re.search(r"desc/(\d+)", card.find_parent("a").get("href")).group(1)
+
+                    if image_id and unique_id:
+
+        """
+        return
+
     def delete_cards(self, *card_unique_ids):
         # remove card from catalog by unique_id
         return
 
     def get_match_for_fuse(self):
+
+        return
+
+    def get_presents(self):
 
         return
 

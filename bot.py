@@ -1,4 +1,4 @@
-import re, operator
+import re
 from woh import WoH
 
 

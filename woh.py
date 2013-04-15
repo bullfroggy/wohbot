@@ -17,6 +17,9 @@ class WoH(object):
         "boost_base_set": "http://ultimate-a.cygames.jp/ultimate/card_str/base_change/",
         "boost_card_set": "http://ultimate-a.cygames.jp/ultimate/card_str/strengthen/",
         "boost_result": "http://ultimate-a.cygames.jp/ultimate/card_str/index/-1/0",
+        "present_list": "http://ultimate-a.cygames.jp/ultimate/present/recieve/0/0/?view_auth_type=1",
+        "present_reg_list": "http://ultimate-a.cygames.jp/ultimate/present/recieve/1/0/?view_auth_type=2",
+        "present_claim": "http://ultimate-a.cygames.jp/ultimate/present/recieve",
         "card_api": "http://rpgotg.herokuapp.com/api/v1/cards/",
     }
     OPERATION_ENERGY_COST = {
