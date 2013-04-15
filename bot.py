@@ -71,7 +71,7 @@ class Bot(object):
 
         # Get all requested cards
         self.player.update_roster()
-        base_cards = self.player.get_roster(rarity=base_rarity, version=base_version, alignment=base_alignment, max_level=base_max_level, max_pwr_req=base_max_pwr_req)
+        base_cards = self.player.get_roster(rarity=base_rarity, version=base_version, alignment=base_alignment, max_level=base_max_level-1, max_pwr_req=base_max_pwr_req)
         boost_cards = self.player.get_roster(rarity=boost_rarity, alignment=boost_alignment, version=boost_version, max_level=boost_max_level, max_pwr_req=boost_max_pwr_req)
 
         # Sort base cards by fused/unfused
@@ -91,12 +91,12 @@ class Bot(object):
                 if base_card.get_unique_id() not in spent_ids:
                     print "Working on " + base_card.get_name() + "/lvl " + str(base_card.get_level())
 
-                    while len(boost_cards) > 0 and base_card.get_level() <= base_max_level:
+                    while len(boost_cards) > 0 and base_card.get_level() < base_max_level:
                         # Get set of matching boost cards
                         boost_set = boost_cards[:boost_count]
                         boost_ids = [bcard.get_unique_id() for bcard in boost_set]
 
-                        print "Found " + str(len(boost_ids)) + " qualifying boosters"
+                        #print "Found " + str(len(boost_ids)) + " qualifying boosters"
                         print base_card.get_name() + " eligible for boost at lvl " + str(base_card.get_level())
                         result = base_card.boost(boost_ids)
 
