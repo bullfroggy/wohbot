@@ -71,9 +71,9 @@ class WoH(object):
         user_agent = {"User-Agent": "Mozilla/5.0 (Linux; Android 4.1.1; Nexus 7 Build/JRO03D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Safari/535.19"}
 
         if req=="get":
-            r = requests.get(url, headers=user_agent, cookies=cookies, data=payload)
+            r = requests.get(url, headers=user_agent, cookies=cookies, data=payload, hooks={'response': make_throttle_hook(5)})
         elif req=="post":
-            r = requests.post(url, headers=user_agent, cookies=cookies, data=payload)
+            r = requests.post(url, headers=user_agent, cookies=cookies, data=payload, hooks={'response': make_throttle_hook(5)})
 
         if r:
             return BeautifulSoup(r.text)
@@ -92,9 +92,9 @@ class WoH(object):
 
     def parse_json(self, url, req="get", payload=dict("")):
         if req=="get":
-            r = requests.get(url, data=payload)
+            r = requests.get(url, data=payload, hooks={'response': make_throttle_hook(5)})
         elif req=="post":
-            r = requests.post(url, data=payload)
+            r = requests.post(url, data=payload, hooks={'response': make_throttle_hook(5)})
         
         if r:
             return r.json()
@@ -104,3 +104,26 @@ class WoH(object):
     def parse_card_json(self, card_id):
         return self.parse_json(self.get_url("card_api") + card_id)
 
+
+
+def make_throttle_hook(timeout=2):
+    """Returns a response hook function which sleeps for <timeout> seconds if
+       the response status_code/content meet certain criteria before
+       re-requesting the content. The timeout length grows for each re-request
+       until it exceeds a threshold, at which point simply return the response object.
+    """
+
+    import time 
+    def myhook(resp):
+        if timeout < 1025:
+            if (resp.status_code == 302) and ("/error/" in resp.url):
+                print "Ope, we got a redirect and error on " + repr(resp.url) + "... trying again..."
+                time.sleep(timeout)
+                proxies = resp.request.proxies
+                cookies = resp.request.cookies
+                auth = resp.request.auth
+                hooks = {'response': make_throttle_hook(timeout=timeout*3)}
+                return requests.get(resp.url, proxies=proxies, cookies=cookies, auth=auth, hooks=hooks)
+        return resp
+    return myhook
+        
