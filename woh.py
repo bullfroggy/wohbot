@@ -75,16 +75,31 @@ class WoH(object):
         elif req=="post":
             r = requests.post(url, headers=user_agent, cookies=cookies, data=payload)
 
-        r.raise_for_status()
-        return BeautifulSoup(r.text)
+        if r:
+            return BeautifulSoup(r.text)
+        else:
+            return False
+
+    def log_card_stats(self, global_id, card_atk, card_def):
+        if (global_id and card_atk and card_def):
+            # send a req to log form with data
+            payload = {
+                "max_attack": card_atk, 
+                "max_defense": card_def,
+            }
+            print "Logging %s into card %d" % (repr(payload), global_id)
+        return requests.put(self.URLS["card_api"] + "%d/" % global_id, data=payload)
 
     def parse_json(self, url, req="get", payload=dict("")):
         if req=="get":
             r = requests.get(url, data=payload)
         elif req=="post":
             r = requests.post(url, data=payload)
-        r.raise_for_status()
-        return r.json()
+        
+        if r:
+            return r.json()
+        else:
+            return False
 
     def parse_card_json(self, card_id):
         return self.parse_json(self.get_url("card_api") + card_id)

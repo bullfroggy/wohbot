@@ -241,7 +241,7 @@ def parse_card(param_id):
  
  
 if __name__ == "__main__":
-    print('\t'.join(["global_id (0)", "name (1)", "name_prefix (2)", "name_id (3)", "root_name (4)", "image_id (5)", "rarity (6)", "alignment (7)", "min_rarity (8)", "base_id (9)", "version (10)", "desc (11)", "base_atk (12)", "base_def (13)", "pwr_req (14)", "gender (15)", "faction (16)", "silver (17)", "max_level (18)", "max_mastery (19)", "ability (20)", "usage (21)", "effect_verbiage (22)", "effect_strength (23)", "effect_cards_affected (24)", "effect_attribute (25)", "effect_player (26)", "effect_direction (27)"]), file=f)
+    print('\t'.join(["%s (%d)" % (label, i) for i, label in enumerate(["global_id", "name", "name_prefix", "name_id", "root_name", "image_id", "rarity", "alignment", "min_rarity", "base_id", "version", "desc", "base_atk", "base_def", "pwr_req", "gender", "faction", "silver", "max_level", "max_mastery", "ability", "usage", "effect_verbiage", "effect_strength", "effect_cards_affected", "effect_attribute", "effect_player", "effect_direction"])]), file=f)
  
     # Check globals based upon a sequence of generated numbers
     for id in list(itertools.product(range(1, 4),

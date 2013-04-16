@@ -188,6 +188,10 @@ class Player(object):
                             "rarity": global_properties["rarity"],
                             "alignment": global_properties["alignment"],
                             "pwr_req": global_properties["power_required"],
+                            "max_level": global_properties["max_level"],
+                            "max_mastery": global_properties["max_mastery"],
+                            "max_attack": global_properties["max_attack"],
+                            "max_defense": global_properties["max_defense"],
                             "level": level,
                             "atk": curr_atk,
                             "def": curr_def,
@@ -201,6 +205,11 @@ class Player(object):
 
                         if curr_card not in new_roster:
                             new_roster.append(curr_card)
+
+                        if (curr_atk > global_properties["max_attack"] or curr_def > global_properties["max_defense"]) and level == global_properties["max_level"] and mastery == global_properties["max_mastery"]:
+                            r = self.woh.log_card_stats(global_properties["global_id"], curr_atk, curr_def)
+                            if r:
+                                print repr(r)
 
         self.roster = new_roster
 
