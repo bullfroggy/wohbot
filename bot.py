@@ -239,16 +239,16 @@ class Bot(object):
         for x in f:
             print int(x)
             if random_num > count:
-                p = self.player.get_rally_points()
                 rand = "http://ultimate-a.cygames.jp/ultimate/cheer/comment_check"
                 cookies = dict(sid=self.player.get_sid())
                 user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
+                p = self.player.get_rally_points()
+                if p > 9995:
+                    print "Rally point limit reached"
+                    break
                 payload = {'message': 'rally!', 'sort': '1', 'to_viewer_id': x, 'bef_friendship_point': p, 'aft_friendship_point': p, 'is_message': '0', 'is_cheer': '0', 'is_error': '0', 'ret_act': '0', 'message_id': "", 'page': '0', 'offset': '0'}
                 r = requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
-                p = self.player.get_rally_points()
                 if "Your Rally has reached maximum limit" in r.text:
-                    break
-                if p > 9988:
                     break
                 moreLines = r.text.splitlines()
                 for line in moreLines:
@@ -268,15 +268,17 @@ class Bot(object):
     def message_friends(self):
         f = self.player.get_friend_list()
         for x in f:
+            print int(x)
             rand = "http://ultimate-a.cygames.jp/ultimate/cheer/comment_check"
             cookies = dict(sid=self.player.get_sid())
             user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
+            p = self.player.get_rally_points()
+            if p > 9988:
+                print "Rally point limit reached"
+                break
             payload = {'message': 'rally!', 'sort': '1', 'to_viewer_id': x, 'bef_friendship_point': p, 'aft_friendship_point': p, 'is_message': '0', 'is_cheer': '0', 'is_error': '0', 'ret_act': '0', 'message_id': "", 'page': '0', 'offset': '0'}
             r = requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
-            p = self.player.get_rally_points()
             if "Your Rally has reached maximum limit" in r.text:
-                break
-            if p > 9988:
                 break
             moreLines = r.text.splitlines()
             for line in moreLines:

@@ -38,7 +38,7 @@ def main():
             bot.buy_rally_packs(cart)
             points = player.get_rally_points()
             print points, "rally points"
-        print "Rallying Players"
+        print "rallying team-members"
     bot.rally_friends()
     points = player.get_rally_points()
     print points, "rally points"
