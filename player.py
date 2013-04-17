@@ -232,7 +232,16 @@ class Player(object):
         while len(page_urls) > 0:
             quantity_elements = html.select(".green")
             for q in quantity_elements:
-                print repr(q)
+                parent_container = q.find_parent("table")
+                sibling_container = parent_container.find_next_sibling("div")
+                #name 
+                #alignment
+                #type
+                #image_id
+                #timestamp
+                #note
+                #present_id
+                print repr()
             if len(page_urls) > 0:
                 html = self.woh.parse_page(page_urls.pop(0))
         """

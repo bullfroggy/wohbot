@@ -22,7 +22,7 @@ def main():
     bot_settings = {
         "player": player,
     }
-    player.update_roster()
+    player.update_presents()
     print "Done!"
 
 if __name__ == '__main__':
