@@ -12,8 +12,8 @@ Configuring cronjob:
     Enter "crontab -e"
 
         Type the following cron config:
-            * */2 * * * 'your_python_path' 'your_rallybot_path' -s 'your_sid'
+            * */2 * * * 'your_repository_path'; 'your_python_path' 'your_rallybot_path' -s 'your_sid'
         Example:
-            * */2 * * * /Users/jla/virtualenvs/marvel/bin/python /Users/jla/Desktop/wohbot/rallybot.py -s f9df4b15b81bef5d93d99c29d0254cbb
+            * */2 * * * cd /Users/jla/Desktop/wohbot /Users/jla/virtualenvs/marvel/bin/python /Users/jla/Desktop/wohbot/rallybot.py -s f9df4b15b81bef5d93d99c29d0254cbb
 
     Save with esc, colon, wq
