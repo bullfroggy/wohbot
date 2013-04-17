@@ -39,10 +39,7 @@ def main():
             points = player.get_rally_points()
             print points, "rally points"
         print "Rallying Players"
-    bot.message_friends()
-    points = player.get_rally_points()
-    print points, "rally points"
-    bot.message_randoms()
+    bot.rally_friends()
     points = player.get_rally_points()
     print points, "rally points"
     remainder = player.get_card_space_remaining()

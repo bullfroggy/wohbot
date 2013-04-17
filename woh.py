@@ -13,7 +13,34 @@ class WoH(object):
         "packs": "http://ultimate-a.cygames.jp/ultimate/gacha/index/0",
 	    "draw_free": "http://ultimate-a.cygames.jp/ultimate/gacha/draw_free",
         "buy_rally_pack": "http://ultimate-a.cygames.jp/ultimate/gacha/draw_free/1",
-        "friend_list": "http://ultimate-a.cygames.jp/ultimate/friend?p="
+        "friend_list": "http://ultimate-a.cygames.jp/ultimate/friend?p=",
+        "fuse_eligible_list": "http://ultimate-a.cygames.jp/ultimate/card_union/union_card/%s/1/0/",
+        "fuse_base_set": "http://ultimate-a.cygames.jp/ultimate/card_union/union_change/",
+        "fuse_card_set": "http://ultimate-a.cygames.jp/ultimate/card_union/synthesis/",
+        "quest_index": "http://ultimate-a.cygames.jp/ultimate/quest"
+    }
+    OPERATION_ENERGY_COST = {
+        1: 1,
+        2: 1,
+        3: 2,
+        4: 3,
+        5: 4,
+        6: 5,
+        7: 6,
+        8: 7,
+        9: 8,
+        10: 9,
+        11: 10,
+        12: 11,
+        13: 12,
+        14: 10,
+        15: 11,
+        16: 12,
+        17: 13,
+        18: 10,
+        19: 11,
+        20: 12,
+        21: 13,
     }
 
     def __init__(self, player):
@@ -25,10 +52,23 @@ class WoH(object):
         else:
             return False
 
-    def parse_page(self, url):
-        user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
+    def get_mission_url(self, operation, mission):
+        if mission == "boss":
+            self.parse_page("http://ultimate-a.cygames.jp/ultimate/quest_boss/appear/%d" % operation, req="post")
+            self.parse_page("http://ultimate-a.cygames.jp/ultimate/smart_phone_flash/quest_boss/%d" % operation, req="post")
+            self.parse_page("http://ultimate-a.cygames.jp/ultimate/quest_boss/boss_play_swf/%d" % operation)
+            return "http://ultimate-a.cygames.jp/ultimate/quest_boss/result/%d/1/0" % operation
+        else:
+            return "http://ultimate-a.cygames.jp/ultimate/quest/play/%d/%d" % (operation, mission)
+
+    def parse_page(self, url, req="get", payload=dict("")):
         cookies = dict(sid=self.player.get_sid())
-        r = requests.get(url, cookies=cookies, headers=user_agent)
+        #print "getting " + url + " with SID " + self.player.get_sid()
+        if req=="get":
+            r = requests.get(url, cookies=cookies, data=payload)
+        elif req=="post":
+            r = requests.post(url, cookies=cookies, data=payload)
+
         if r.status_code == 200:
             return BeautifulSoup(r.text)
         else:

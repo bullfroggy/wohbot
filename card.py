@@ -1,16 +1,27 @@
-class Card(object):
+class CommonEqualityMixin(object):
+
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__)
+            and self.get_unique_id() == other.get_unique_id())
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+class Card(CommonEqualityMixin):
+    unique_id = None
     properties = {
-    "global_id": "",
-    "img_id": "",
-    "alignment": 1,
-    "rarity": 0,
-    "max_level": 99,
-    "level": 1,
-    "ability_level": 1,
-    "atk_pwr": None,
-    "def_pwr": None,
-    "pwr_req": None,
-    "silver": 0,
+        "global_id": "",
+        "img_id": "",
+        "alignment": 1,
+        "rarity": 0,
+        "max_level": 99,
+        "level": 1,
+        "ability_level": 1,
+        "atk_pwr": None,
+        "def_pwr": None,
+        "pwr_req": None,
+        "silver": 0,
+        "xp": 0,
     }
 
     def __init__(self, unique_id, properties):
@@ -59,7 +70,6 @@ class Card(object):
     def set_silver(self, silver):
         self.properties.update({"silver": silver})
 
-
     def get_global_id(self):
         return self.properties["global_id"]
 
@@ -95,3 +105,17 @@ class Card(object):
 
     def get_silver(self):
         return self.properties["silver"]
+
+    def fuse(self, fuser_card):
+        r_set_base = self.woh.parse_page(self.woh.URLS['fuse_base_set'] + self.get_unique_id())
+        if r_set_base:
+            #read page HTML to ensure base card is what we expect
+            #success!
+            r_fuse_card = self.woh.parse_page(self.woh.URLS['fuse_card_set'] + fuser_card, payload=dict({'sleeve_str': fuser_card}))
+            if r_fuse_card:
+                #read page HTML to get success message
+                #double success!
+                pass
+
+
+
