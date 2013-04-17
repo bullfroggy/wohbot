@@ -62,12 +62,13 @@ class WoH(object):
             return "http://ultimate-a.cygames.jp/ultimate/quest/play/%d/%d" % (operation, mission)
 
     def parse_page(self, url, req="get", payload=dict("")):
+        user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
         cookies = dict(sid=self.player.get_sid())
         #print "getting " + url + " with SID " + self.player.get_sid()
         if req=="get":
             r = requests.get(url, cookies=cookies, data=payload)
         elif req=="post":
-            r = requests.post(url, cookies=cookies, data=payload)
+            r = requests.post(url, cookies=cookies, data=payload, headers=user_agent)
 
         if r.status_code == 200:
             return BeautifulSoup(r.text)

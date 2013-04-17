@@ -1,5 +1,6 @@
 from woh import WoH
 import requests
+import time
 
 
 class Bot(object):
@@ -203,7 +204,94 @@ class Bot(object):
                     print "Too many taps"
         return True
 
+    def remove_message(self, x):
+        start = "http://ultimate-a.cygames.jp/ultimate/profile/show/"
+        URL = start + str(x)
+        userURL = self.woh.parse_page(URL)
+        URLines = str(userURL).splitlines()
+        for line in URLines:
+            if "ultimate/cheer/remove_comment" in line:
+                deleteURL = line.split('"')[3]
+                r = self.woh.parse_page(deleteURL)
+                Deleter = str(r).splitlines()
+                for line in Deleter:
+                    if "message_id" in line:
+                        message_id = line.split('"')[5]
+                    if "viewer_id" in line:
+                        viewer_id = line.split('"')[5]
+                    if "friend_id" in line:
+                        friend_id = line.split('"')[5]
+                for line in Deleter:
+                    if "ultimate/cheer/exec_remove" in line:
+                        deleteNOW = line.split('"')[1]
+                        cookies = dict(sid=self.player.get_sid())
+                        user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
+                        payload = {'message_id': message_id, 'viewer_id': viewer_id, 'friend_id': friend_id}
+                        a = requests.post(deleteNOW, data=payload, cookies=cookies, headers=user_agent)
+                        if "You have deleted a Rally." in a.text:
+                            print "Message Deleted"
+                break
+
+    def message_randoms(self):
+        f = open('users.txt')
+        random_num = self.player.get_num_randoms()
+        count = 0
+        for x in f:
+            print int(x)
+            if random_num > count:
+                p = self.player.get_rally_points()
+                rand = "http://ultimate-a.cygames.jp/ultimate/cheer/comment_check"
+                cookies = dict(sid=self.player.get_sid())
+                user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
+                payload = {'message': 'rally!', 'sort': '1', 'to_viewer_id': x, 'bef_friendship_point': p, 'aft_friendship_point': p, 'is_message': '0', 'is_cheer': '0', 'is_error': '0', 'ret_act': '0', 'message_id': "", 'page': '0', 'offset': '0'}
+                r = requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+                p = self.player.get_rally_points()
+                if "Your Rally has reached maximum limit" in r.text:
+                    break
+                if p > 9988:
+                    break
+                moreLines = r.text.splitlines()
+                for line in moreLines:
+                    if "ultimate/cheer/send_check" in line:
+                        rand = line.split("'")[1]
+                        cookies = dict(sid=self.player.get_sid())
+                        user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
+                        payload = {'to_viewer_id': x, 'ret_act': '0', 'message_id': "", 'sort': '1', 'page': '0'}
+                        requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+                        count += 1
+                        print "Sending message"
+                        self.remove_message(int(x))
+            else:
+                break
+        return True
+
     def message_friends(self):
+        f = self.player.get_friend_list()
+        for x in f:
+            rand = "http://ultimate-a.cygames.jp/ultimate/cheer/comment_check"
+            cookies = dict(sid=self.player.get_sid())
+            user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
+            payload = {'message': 'rally!', 'sort': '1', 'to_viewer_id': x, 'bef_friendship_point': p, 'aft_friendship_point': p, 'is_message': '0', 'is_cheer': '0', 'is_error': '0', 'ret_act': '0', 'message_id': "", 'page': '0', 'offset': '0'}
+            r = requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+            p = self.player.get_rally_points()
+            if "Your Rally has reached maximum limit" in r.text:
+                break
+            if p > 9988:
+                break
+            moreLines = r.text.splitlines()
+            for line in moreLines:
+                if "ultimate/cheer/send_check" in line:
+                    rand = line.split("'")[1]
+                    cookies = dict(sid=self.player.get_sid())
+                    user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
+                    payload = {'to_viewer_id': x, 'ret_act': '0', 'message_id': "", 'sort': '1', 'page': '0'}
+                    requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
+                    print "Sending message"
+                    self.remove_message(int(x))
+        return True
+
+    def rally_message_friends(self):
+
         f = self.player.get_friend_list()
         for x in f:
             p = self.player.get_rally_points()
@@ -218,6 +306,9 @@ class Bot(object):
             print "Rallying user", ID
             rallyURL = self.woh.parse_page(URL)
             #time.sleep(1)
+            while "but did not receive any Rally Points" in str(rallyURL):
+                time.sleep(10)
+                rallyURL = self.woh.parse_page(URL)
             if "You rallied" in str(rallyURL):
                 print "Successfully rallied user"
             else:
@@ -237,7 +328,7 @@ class Bot(object):
                         p = self.player.get_rally_points()
                         rand = line.split('"')[1]
                         cookies = dict(sid=self.player.get_sid())
-                        user_agent = {'User-agent': 'Mozilla/5.0'}
+                        user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
                         payload = {'message': 'rally!', 'sort': '1', 'to_viewer_id': x, 'bef_friendship_point': p, 'aft_friendship_point': p, 'is_message': '0', 'is_cheer': '0', 'is_error': '0', 'ret_act': '0', 'message_id': mess, 'page': '0', 'offset': '0'}
                         r = requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
                         moreLines = r.text.splitlines()
@@ -245,13 +336,15 @@ class Bot(object):
                             if "ultimate/cheer/send_check" in line:
                                 rand = line.split("'")[1]
                                 cookies = dict(sid=self.player.get_sid())
-                                user_agent = {'User-agent': 'Mozilla/5.0'}
+                                user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
                                 payload = {'to_viewer_id': x, 'ret_act': '0', 'message_id': "", 'sort': '1', 'page': '0'}
                                 requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
                                 print "Sending message"
+                                self.remove_message(int(x))
         return True
 
-    def message_randoms(self):
+    def rally_message_randoms(self):
+        friends = self.player.get_friend_list()
         f = open('users.txt')
         random_num = self.player.get_num_randoms()
         count = 0
@@ -266,6 +359,8 @@ class Bot(object):
                 ID = int(x)
                 URL = start + str(ID)
                 #time.sleep(1)
+                if x in friends:
+                    continue
                 print "Rallying user", ID
                 rallyURL = self.woh.parse_page(URL)
                 #time.sleep(1)
@@ -290,7 +385,7 @@ class Bot(object):
                                 p = self.player.get_rally_points()
                                 rand = line.split('"')[1]
                                 cookies = dict(sid=self.player.get_sid())
-                                user_agent = {'User-agent': 'Mozilla/5.0'}
+                                user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
                                 payload = {'message': 'rally!', 'sort': '1', 'to_viewer_id': x, 'bef_friendship_point': p, 'aft_friendship_point': p, 'is_message': '0', 'is_cheer': '0', 'is_error': '0', 'ret_act': '0', 'message_id': mess, 'page': '0', 'offset': '0'}
                                 r = requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
                                 moreLines = r.text.splitlines()
@@ -298,11 +393,12 @@ class Bot(object):
                                     if "ultimate/cheer/send_check" in line:
                                         rand = line.split("'")[1]
                                         cookies = dict(sid=self.player.get_sid())
-                                        user_agent = {'User-agent': 'Mozilla/5.0'}
+                                        user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
                                         payload = {'to_viewer_id': x, 'ret_act': '0', 'message_id': "", 'sort': '1', 'page': '0'}
                                         requests.post(rand, data=payload, cookies=cookies, headers=user_agent)
                                         print "Sending message"
                                         count += 1
+                                        self.remove_message(int(x))
                 else:
                     break
             else:

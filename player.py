@@ -1,6 +1,7 @@
 import re
 from card import Card
 from woh import WoH
+import requests
 
 
 class Player(object):
@@ -219,9 +220,12 @@ class Player(object):
             start = "http://ultimate-a.cygames.jp/ultimate/friend?p="
             ID = x + 1
             URL = start + str(ID)
-            friendURL = self.woh.parse_page(URL)
+            cookies = dict(sid=self.get_sid())
+            user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
+            r = requests.get(URL, cookies=cookies, headers=user_agent)
+            friendURL = r.text
             if friendURL:
-                lines = str(friendURL).splitlines()
+                lines = friendURL.splitlines()
                 for line in lines:
                     if "ultimate/profile/show" in line:
                         user = line.split('/')[6].split('?')[0]
@@ -232,6 +236,4 @@ class Player(object):
         f = self.get_friend_num()
         friendRallies = (f * 12) + f
         randRallies = 500 - friendRallies
-        runRand = (randRallies / 12)
-        print runRand
-        return runRand
+        return randRallies
