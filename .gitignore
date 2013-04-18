@@ -1,3 +1,5 @@
 /.idea
 *.pyc
 *.tsv
+/venv
+*.sublime-workspace

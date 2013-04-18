@@ -6,18 +6,25 @@ class WoH(object):
     URLS = {
         "mypage": "http://ultimate-a.cygames.jp/ultimate/mypage/index",
         "fusion": "http://ultimate-a.cygames.jp/ultimate/card_union",
+        "quest_index": "http://ultimate-a.cygames.jp/ultimate/quest",
         "mission_23": "http://ultimate-a.cygames.jp/ultimate/quest/play/2/3",
         "mission_24": "http://ultimate-a.cygames.jp/ultimate/quest/play/2/4",
-        "card_list_index": "http://ultimate-a.cygames.jp/ultimate/card_list/index/0/1/0/",
+        "card_list_index": "http://ultimate-a.cygames.jp/ultimate/card_list/index/%d/1/0/%d",
         "card_list_desc": "http://ultimate-a.cygames.jp/ultimate/card_list/desc/",
         "packs": "http://ultimate-a.cygames.jp/ultimate/gacha/index/0",
 	    "draw_free": "http://ultimate-a.cygames.jp/ultimate/gacha/draw_free",
         "buy_rally_pack": "http://ultimate-a.cygames.jp/ultimate/gacha/draw_free/1",
         "friend_list": "http://ultimate-a.cygames.jp/ultimate/friend?p=",
-        "fuse_eligible_list": "http://ultimate-a.cygames.jp/ultimate/card_union/union_card/%s/1/0/",
+        "fuse_eligible_list": "http://ultimate-a.cygames.jp/ultimate/card_union/union_card/%d/1/0/%d",
         "fuse_base_set": "http://ultimate-a.cygames.jp/ultimate/card_union/union_change/",
-        "fuse_card_set": "http://ultimate-a.cygames.jp/ultimate/card_union/synthesis/",
-        "quest_index": "http://ultimate-a.cygames.jp/ultimate/quest"
+        "fuse_card_set": "http://ultimate-a.cygames.jp/ultimate/card_union/synthesis/%s?sleeve_str=%s",
+        "boost_base_set": "http://ultimate-a.cygames.jp/ultimate/card_str/base_change/",
+        "boost_card_set": "http://ultimate-a.cygames.jp/ultimate/card_str/strengthen/",
+        "boost_result": "http://ultimate-a.cygames.jp/ultimate/card_str/index/-1/0",
+        "present_list": "http://ultimate-a.cygames.jp/ultimate/present/recieve/0/0/?view_auth_type=1",
+        "present_reg_list": "http://ultimate-a.cygames.jp/ultimate/present/recieve/1/0/?view_auth_type=2",
+        "present_claim": "http://ultimate-a.cygames.jp/ultimate/present/recieve",
+        "card_api": "http://rpgotg.herokuapp.com/api/v1/cards/",
     }
     OPERATION_ENERGY_COST = {
         1: 1,
@@ -62,15 +69,64 @@ class WoH(object):
             return "http://ultimate-a.cygames.jp/ultimate/quest/play/%d/%d" % (operation, mission)
 
     def parse_page(self, url, req="get", payload=dict("")):
-        user_agent = {'User-agent': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B)'}
-        cookies = dict(sid=self.player.get_sid())
-        #print "getting " + url + " with SID " + self.player.get_sid()
-        if req=="get":
-            r = requests.get(url, cookies=cookies, data=payload)
-        elif req=="post":
-            r = requests.post(url, cookies=cookies, data=payload, headers=user_agent)
 
-        if r.status_code == 200:
+        cookies = dict(sid=self.player.get_sid())
+        user_agent = {"User-Agent": "Mozilla/5.0 (Linux; Android 4.1.1; Nexus 7 Build/JRO03D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Safari/535.19"}
+
+        if req=="get":
+            r = requests.get(url, headers=user_agent, cookies=cookies, data=payload, hooks={'response': make_throttle_hook(5)})
+        elif req=="post":
+            r = requests.post(url, headers=user_agent, cookies=cookies, data=payload, hooks={'response': make_throttle_hook(5)})
+
+        if r:
             return BeautifulSoup(r.text)
         else:
             return False
+
+    def log_card_stats(self, global_id, card_atk, card_def):
+        if (global_id and card_atk and card_def):
+            # send a req to log form with data
+            payload = {
+                "max_attack": card_atk, 
+                "max_defense": card_def,
+            }
+            print "Logging %s into card %d" % (repr(payload), global_id)
+        return requests.put(self.URLS["card_api"] + "%d/" % global_id, data=payload)
+
+    def parse_json(self, url, req="get", payload=dict("")):
+        if req=="get":
+            r = requests.get(url, data=payload, hooks={'response': make_throttle_hook(5)})
+        elif req=="post":
+            r = requests.post(url, data=payload, hooks={'response': make_throttle_hook(5)})
+        
+        if r:
+            return r.json()
+        else:
+            return False
+
+    def parse_card_json(self, card_id):
+        return self.parse_json(self.get_url("card_api") + card_id)
+
+
+
+def make_throttle_hook(timeout=2):
+    """Returns a response hook function which sleeps for <timeout> seconds if
+       the response status_code/content meet certain criteria before
+       re-requesting the content. The timeout length grows for each re-request
+       until it exceeds a threshold, at which point simply return the response object.
+    """
+
+    import time 
+    def myhook(resp):
+        if timeout < 1025:
+            if (resp.status_code == 302) and ("/error/" in resp.url):
+                print "Ope, we got a redirect and error on " + repr(resp.url) + "... trying again..."
+                time.sleep(timeout)
+                proxies = resp.request.proxies
+                cookies = resp.request.cookies
+                auth = resp.request.auth
+                hooks = {'response': make_throttle_hook(timeout=timeout*3)}
+                return requests.get(resp.url, proxies=proxies, cookies=cookies, auth=auth, hooks=hooks)
+        return resp
+    return myhook
+        
